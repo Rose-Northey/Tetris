@@ -12,8 +12,11 @@ public class ObjectsOnGrid
     private const int nYPixelsInGrid= 20;
     public readonly int widthGrid;
     public readonly int heightGrid;
-    private int fallingObject;
-    private Pixel[] objects;
+    private Pixel fallingObject;
+    private List<Pixel> approachingObjects;
+    private int gridSquareSize;
+    private List<Pixel> objectsOnGrid;
+    
     
     
     public ObjectsOnGrid(int windowWidth, int windowHeight, int pixelWidth)
@@ -22,26 +25,42 @@ public class ObjectsOnGrid
         this.heightGrid = pixelWidth * nYPixelsInGrid;
         this.xOrigin = (windowWidth - widthGrid) / 2;
         this.yOrigin = (windowHeight - heightGrid) / 2;
+        this.gridSquareSize = pixelWidth;
         ResetGrid();
         
     }
     
-    public void DrawObjects()
+    public void DrawObjectFrame()
     {
-        foreach (Pixel pixel in this.objects)
-        {
-            Raylib.DrawRectangle(xOrigin, yOrigin, pixel.Width, pixel.Width, Color.Red);
-        }
-        //draw square at 00 on grid
-        //initialise falling object and draw it on grid
-        //then think about fall
+        
+            Raylib.DrawRectangle(fallingObject.X, fallingObject.Y, fallingObject.Width, fallingObject.Width, Color.Red);
+
+            foreach (var obj in objectsOnGrid)
+            {
+                Raylib.DrawRectangle(obj.X, obj.Y, obj.Width, obj.Width, Color.Blue);
+            }
         
     }
     
     public void ResetGrid()
     {
         var newPixel = new Pixel(xOrigin, yOrigin);
-        this.objects = [newPixel];
+        var newPixel2 = new Pixel(xOrigin, yOrigin);
+        
+        approachingObjects = [newPixel,newPixel2];
+        fallingObject= approachingObjects[0];
+        objectsOnGrid = [];
+    }
+    public void enactGravity()
+    {
+        if (fallingObject.Y == heightGrid+yOrigin-fallingObject.Width)
+        {
+            objectsOnGrid.Add(fallingObject);
+            approachingObjects.RemoveAt(0);
+            fallingObject = approachingObjects[0];
+        }
+        fallingObject.Y+= gridSquareSize;
+        
     }
 
     

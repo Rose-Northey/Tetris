@@ -19,16 +19,17 @@ internal static class Program
     public static void Main()
     {
         var gameState = new GameState();
-        var objectsOnGrid = new ObjectsOnGrid(windowWidth,windowHeight, pixelWidth);
+        gameState.ObjectsOnGrid = new ObjectsOnGrid(windowWidth,windowHeight, pixelWidth);
+        gameState.Reset();
         openTetrisInMiddleOfScreen(windowWidth, windowHeight);
         while (!Raylib.WindowShouldClose())
         {
             gameState.gameTime += Raylib.GetFrameTime();
             Raylib.BeginDrawing();
             Raylib.ClearBackground(colourOfBG);
-            DrawGrid(objectsOnGrid.xOrigin,objectsOnGrid.yOrigin, objectsOnGrid);
-            objectsOnGrid.DrawObjects();
-            PlayTetris(objectsOnGrid.xOrigin, objectsOnGrid.yOrigin);
+            DrawGrid(gameState.ObjectsOnGrid.xOrigin,gameState.ObjectsOnGrid.yOrigin, gameState.ObjectsOnGrid);
+            
+            PlayTetris(gameState);
             Raylib.EndDrawing();
         }
         Raylib.CloseWindow();
@@ -50,10 +51,13 @@ internal static class Program
         Raylib.DrawRectangleLines(x-1, y-1, objectsOnGrid.widthGrid+2, objectsOnGrid.heightGrid+2, colourOfGridBorder);
     }
 
-    private static void PlayTetris(int x, int y)
+    private static void PlayTetris(GameState gameState)
     {
+        gameState.ObjectsOnGrid.DrawObjectFrame();
+        if (gameState.gameTime <= gameState.gameSpeed) return;
+        gameState.gameTime = 0; 
+        gameState.ObjectsOnGrid.enactGravity();
         
-        Raylib.DrawRectangle(700,480, 30,30, Color.DarkPurple);
     }
 
     static void openTetrisInMiddleOfScreen(int windowWidth, int windowHeight)
