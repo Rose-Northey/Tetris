@@ -32,36 +32,53 @@ public class ObjectsOnGrid
     
     public void DrawObjectFrame()
     {
-        
-            Raylib.DrawRectangle(fallingObject.X, fallingObject.Y, fallingObject.Width, fallingObject.Width, Color.Red);
+            Raylib.DrawRectangle(fallingObject.X, fallingObject.Y, Pixel.Width, Pixel.Width, Color.Red);
 
             foreach (var obj in objectsOnGrid)
             {
-                Raylib.DrawRectangle(obj.X, obj.Y, obj.Width, obj.Width, Color.Blue);
+                Raylib.DrawRectangle(obj.X, obj.Y, Pixel.Width, Pixel.Width, Color.Blue);
             }
         
+    }
+
+    void SpawnObject()
+    {
+        var spawnPixel = Random.Shared.Next(0,10);
+        var newObject = new Pixel(xOrigin + spawnPixel * gridSquareSize, yOrigin - gridSquareSize);
+        approachingObjects.Add(newObject);
     }
     
     public void ResetGrid()
     {
-        var newPixel = new Pixel(xOrigin, yOrigin);
-        var newPixel2 = new Pixel(xOrigin, yOrigin);
-        
-        approachingObjects = [newPixel,newPixel2];
+        approachingObjects = [];
+        SpawnObject();
         fallingObject= approachingObjects[0];
         objectsOnGrid = [];
     }
     public void enactGravity()
     {
-        if (fallingObject.Y == heightGrid+yOrigin-fallingObject.Width)
+        if (fallingObject.Y == heightGrid+yOrigin-Pixel.Width)
         {
             objectsOnGrid.Add(fallingObject);
             approachingObjects.RemoveAt(0);
+            SpawnObject();
             fallingObject = approachingObjects[0];
         }
         fallingObject.Y+= gridSquareSize;
-        
+        // before moving each time, checks if the block underneath is empty. This only happens when the block is about to move
     }
 
-    
+    bool checkIsSettled()
+    {
+        var spaceBeneath = fallingObject.Y + gridSquareSize;
+        foreach (var obj in objectsOnGrid)
+        {
+            if (obj.X == fallingObject.X)
+            {
+                    return obj.Y == spaceBeneath;
+            }
+        }
+
+        return false;
+    }
 }
