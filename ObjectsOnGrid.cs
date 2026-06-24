@@ -32,6 +32,7 @@ public class ObjectsOnGrid
     
     public void DrawObjectFrame()
     {
+        //TODO: when I'm drawing the object, that's when I use the actual pixels but before that I use grid squares
             Raylib.DrawRectangle(fallingObject.X, fallingObject.Y, Pixel.Width, Pixel.Width, Color.Red);
 
             foreach (var obj in objectsOnGrid)
@@ -43,8 +44,7 @@ public class ObjectsOnGrid
 
     void SpawnObject()
     {
-        var spawnPixel = Random.Shared.Next(0,10);
-        var newObject = new Pixel(xOrigin + spawnPixel * gridSquareSize, yOrigin - gridSquareSize);
+        var newObject = new Pixel(xOrigin + widthGrid / 2, yOrigin);
         approachingObjects.Add(newObject);
     }
     
@@ -65,21 +65,21 @@ public class ObjectsOnGrid
             fallingObject = approachingObjects[0];
         }
         fallingObject.Y+= gridSquareSize;
-        // before moving each time, checks if the block underneath is empty. This only happens when the block is about to move
     }
 
     bool isSettled()
     {
         var spaceBeneath = fallingObject.Y + gridSquareSize;
-        if (spaceBeneath > heightGrid+yOrigin-Pixel.Width) return true;
+        var bottomOfGrid = yOrigin + heightGrid;
+        if (spaceBeneath == bottomOfGrid) return true;
+        
         foreach (var obj in objectsOnGrid)
         {
             if (obj.X == fallingObject.X)
             {
-                    return obj.Y == spaceBeneath;
+                    if (obj.Y == spaceBeneath){return true;}
             }
         }
-
         return false;
     }
 }

@@ -54,6 +54,7 @@ internal static class Program
     private static void PlayTetris(GameState gameState)
     {
         gameState.ObjectsOnGrid.DrawObjectFrame();
+        // keyboard press
         if (gameState.gameTime <= gameState.gameSpeed) return;
         gameState.gameTime = 0; 
         gameState.ObjectsOnGrid.enactGravity();
