@@ -57,7 +57,7 @@ public class ObjectsOnGrid
     }
     public void enactGravity()
     {
-        if (fallingObject.Y == heightGrid+yOrigin-Pixel.Width)
+        if (isSettled())
         {
             objectsOnGrid.Add(fallingObject);
             approachingObjects.RemoveAt(0);
@@ -68,9 +68,10 @@ public class ObjectsOnGrid
         // before moving each time, checks if the block underneath is empty. This only happens when the block is about to move
     }
 
-    bool checkIsSettled()
+    bool isSettled()
     {
         var spaceBeneath = fallingObject.Y + gridSquareSize;
+        if (spaceBeneath > heightGrid+yOrigin-Pixel.Width) return true;
         foreach (var obj in objectsOnGrid)
         {
             if (obj.X == fallingObject.X)
