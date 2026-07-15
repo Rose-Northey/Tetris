@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Security.AccessControl;
 using Raylib_cs;
 using Tetris;
 
@@ -54,11 +55,21 @@ internal static class Program
     private static void PlayTetris(GameState gameState)
     {
         gameState.ObjectsOnGrid.DrawObjectFrame();
+        handleInput(gameState);
         // keyboard press
         if (gameState.gameTime <= gameState.gameSpeed) return;
         gameState.gameTime = 0; 
         gameState.ObjectsOnGrid.enactGravity();
         
+    }
+
+    private static void handleInput(GameState gameState)
+    {
+        var leftPressed = Raylib.IsKeyDown(KeyboardKey.Left);
+        var rightPressed = Raylib.IsKeyDown(KeyboardKey.Right);
+        if (Raylib.IsKeyPressed(KeyboardKey.Left)) gameState.ObjectsOnGrid.moveFallingObject(-pixelWidth, 0);
+        if (Raylib.IsKeyPressed(KeyboardKey.Right)) gameState.ObjectsOnGrid.moveFallingObject(pixelWidth, 0); 
+        if (Raylib.IsKeyPressed(KeyboardKey.Down)) gameState.ObjectsOnGrid.moveFallingObject(0, pixelWidth);
     }
 
     static void openTetrisInMiddleOfScreen(int windowWidth, int windowHeight)

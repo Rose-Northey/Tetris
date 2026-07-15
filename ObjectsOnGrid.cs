@@ -12,7 +12,7 @@ public class ObjectsOnGrid
     private const int nYPixelsInGrid= 20;
     public readonly int widthGrid;
     public readonly int heightGrid;
-    private Pixel fallingObject;
+    public Pixel fallingObject;
     private List<Pixel> approachingObjects;
     private int gridSquareSize;
     private List<Pixel> objectsOnGrid;
@@ -81,5 +81,19 @@ public class ObjectsOnGrid
             }
         }
         return false;
+    }
+    
+    public void moveFallingObject(int x, int y)
+    {
+        var aspiringX = fallingObject.X + x;
+        var aspiringY = fallingObject.Y + y;
+        
+        
+        if (aspiringX < xOrigin || aspiringX > xOrigin + widthGrid-gridSquareSize) return;
+        if (aspiringY > yOrigin + heightGrid - gridSquareSize) return;
+        if (objectsOnGrid.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return;
+
+        fallingObject.X += x ;
+        fallingObject.Y += y;
     }
 }
