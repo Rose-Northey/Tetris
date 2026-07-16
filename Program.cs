@@ -38,18 +38,20 @@ internal static class Program
 
     private static void DrawGrid(int x, int y, ObjectsOnGrid objectsOnGrid)
     {
+        var widthGrid = ObjectsOnGrid.nXPixelsInGrid * objectsOnGrid.gridSquareSize;
+        var heightGrid = ObjectsOnGrid.nYPixelsInGrid * objectsOnGrid.gridSquareSize;
         const int lineWidth = 1;
-        Raylib.DrawRectangle(x, y, objectsOnGrid.widthGrid, objectsOnGrid.heightGrid,colourOfGridFill);
+        Raylib.DrawRectangle(x, y, widthGrid, heightGrid,colourOfGridFill);
      
-        for (var i = x; i <= objectsOnGrid.widthGrid+x; i+=pixelWidth)
+        for (var i = x; i <= widthGrid+x; i+=pixelWidth)
         {
-            Raylib.DrawRectangle(i, y,lineWidth, objectsOnGrid.heightGrid, colourOfGridLines);
+            Raylib.DrawRectangle(i, y,lineWidth, heightGrid, colourOfGridLines);
         }
-        for (var i = y; i <= objectsOnGrid.heightGrid + y; i += pixelWidth)
+        for (var i = y; i <= heightGrid + y; i += pixelWidth)
         {
-            Raylib.DrawRectangle(x, i, objectsOnGrid.widthGrid, lineWidth, colourOfGridLines);
+            Raylib.DrawRectangle(x, i, widthGrid, lineWidth, colourOfGridLines);
         }
-        Raylib.DrawRectangleLines(x-1, y-1, objectsOnGrid.widthGrid+2, objectsOnGrid.heightGrid+2, colourOfGridBorder);
+        Raylib.DrawRectangleLines(x-1, y-1, widthGrid+2, heightGrid+2, colourOfGridBorder);
     }
 
     private static void PlayTetris(GameState gameState)
@@ -65,11 +67,9 @@ internal static class Program
 
     private static void handleInput(GameState gameState)
     {
-        var leftPressed = Raylib.IsKeyDown(KeyboardKey.Left);
-        var rightPressed = Raylib.IsKeyDown(KeyboardKey.Right);
-        if (Raylib.IsKeyPressed(KeyboardKey.Left)) gameState.ObjectsOnGrid.moveFallingObject(-pixelWidth, 0);
-        if (Raylib.IsKeyPressed(KeyboardKey.Right)) gameState.ObjectsOnGrid.moveFallingObject(pixelWidth, 0); 
-        if (Raylib.IsKeyPressed(KeyboardKey.Down)) gameState.ObjectsOnGrid.moveFallingObject(0, pixelWidth);
+        if (Raylib.IsKeyPressed(KeyboardKey.Left)) gameState.ObjectsOnGrid.moveFallingObject(-1, 0);
+        if (Raylib.IsKeyPressed(KeyboardKey.Right)) gameState.ObjectsOnGrid.moveFallingObject(1, 0); 
+        if (Raylib.IsKeyPressed(KeyboardKey.Down)) gameState.ObjectsOnGrid.moveFallingObject(0, 1);
     }
 
     static void openTetrisInMiddleOfScreen(int windowWidth, int windowHeight)
