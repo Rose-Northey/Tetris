@@ -20,7 +20,7 @@ internal static class Program
     public static void Main()
     {
         var gameState = new GameState();
-        gameState.ObjectsOnGrid = new ObjectsOnGrid(windowWidth,windowHeight, pixelWidth);
+        gameState.ShapesOnGrid = new ShapesOnGrid(windowWidth,windowHeight, pixelWidth);
         gameState.Reset();
         openTetrisInMiddleOfScreen(windowWidth, windowHeight);
         while (!Raylib.WindowShouldClose())
@@ -28,7 +28,7 @@ internal static class Program
             gameState.gameTime += Raylib.GetFrameTime();
             Raylib.BeginDrawing();
             Raylib.ClearBackground(colourOfBG);
-            DrawGrid(gameState.ObjectsOnGrid.xOrigin,gameState.ObjectsOnGrid.yOrigin, gameState.ObjectsOnGrid);
+            DrawGrid(gameState.ShapesOnGrid.xOrigin,gameState.ShapesOnGrid.yOrigin, gameState.ShapesOnGrid);
             
             PlayTetris(gameState);
             Raylib.EndDrawing();
@@ -36,10 +36,10 @@ internal static class Program
         Raylib.CloseWindow();
     }
 
-    private static void DrawGrid(int x, int y, ObjectsOnGrid objectsOnGrid)
+    private static void DrawGrid(int x, int y, ShapesOnGrid shapesOnGrid)
     {
-        var widthGrid = ObjectsOnGrid.nXPixelsInGrid * objectsOnGrid.gridSquareSize;
-        var heightGrid = ObjectsOnGrid.nYPixelsInGrid * objectsOnGrid.gridSquareSize;
+        var widthGrid = ShapesOnGrid.nXPixelsInGrid * shapesOnGrid.gridSquareSize;
+        var heightGrid = ShapesOnGrid.nYPixelsInGrid * shapesOnGrid.gridSquareSize;
         const int lineWidth = 1;
         Raylib.DrawRectangle(x, y, widthGrid, heightGrid,colourOfGridFill);
      
@@ -56,20 +56,20 @@ internal static class Program
 
     private static void PlayTetris(GameState gameState)
     {
-        gameState.ObjectsOnGrid.DrawObjectFrame();
+        gameState.ShapesOnGrid.DrawFrame();
         handleInput(gameState);
         // keyboard press
         if (gameState.gameTime <= gameState.gameSpeed) return;
         gameState.gameTime = 0; 
-        gameState.ObjectsOnGrid.enactGravity();
+        gameState.ShapesOnGrid.enactGravity();
         
     }
 
     private static void handleInput(GameState gameState)
     {
-        if (Raylib.IsKeyPressed(KeyboardKey.Left)) gameState.ObjectsOnGrid.moveFallingObject(-1, 0);
-        if (Raylib.IsKeyPressed(KeyboardKey.Right)) gameState.ObjectsOnGrid.moveFallingObject(1, 0); 
-        if (Raylib.IsKeyPressed(KeyboardKey.Down)) gameState.ObjectsOnGrid.moveFallingObject(0, 1);
+        if (Raylib.IsKeyPressed(KeyboardKey.Left)) gameState.ShapesOnGrid.moveFallingShape(-1, 0);
+        if (Raylib.IsKeyPressed(KeyboardKey.Right)) gameState.ShapesOnGrid.moveFallingShape(1, 0); 
+        if (Raylib.IsKeyPressed(KeyboardKey.Down)) gameState.ShapesOnGrid.moveFallingShape(0, 1);
     }
 
     static void openTetrisInMiddleOfScreen(int windowWidth, int windowHeight)
