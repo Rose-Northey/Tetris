@@ -10,8 +10,8 @@ public class ShapesOnGrid
     public int yOrigin;
     public const int nXPixelsInGrid= 5;
     public const int nYPixelsInGrid= 10;
-    private Pixel fallingShape;
-    private List<Pixel> approachingShapes;
+    private Shape fallingShape;
+    private List<Shape> approachingShapes;
     public int gridSquareSize;
     private List<Pixel> settledShapes;
     
@@ -27,14 +27,17 @@ public class ShapesOnGrid
     
     public void DrawFrame()
     {
-        var (fallingObjX, fallingObjY) = gridToWindowCoordinates(fallingShape.X, fallingShape.Y);
-            Raylib.DrawRectangle(fallingObjX, fallingObjY, Pixel.Width, Pixel.Width, Color.Red);
-
-            foreach (var obj in settledShapes)
-            {
-                var (gridObjX, gridObjY) = gridToWindowCoordinates(obj.X, obj.Y);
-                Raylib.DrawRectangle(gridObjX, gridObjY, Pixel.Width, Pixel.Width, Color.Blue);
-            }
+        foreach (var pixel in fallingShape.PixelsInShape)
+        {
+                    var (pixelX, pixelY) = gridToWindowCoordinates(pixel.X, pixel.Y);
+                        Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, Color.Red);
+        }
+        foreach (var obj in settledShapes)
+        {
+            var (gridObjX, gridObjY) = gridToWindowCoordinates(obj.X, obj.Y);
+            Raylib.DrawRectangle(gridObjX, gridObjY, Pixel.Width, Pixel.Width, Color.Blue);
+        }
+        
     }
 
     private (int, int) gridToWindowCoordinates(int gridX, int gridY)
@@ -47,8 +50,8 @@ public class ShapesOnGrid
 
     void SpawnShape()
     {
-        var newObject = new Pixel(0 + nXPixelsInGrid / 2, 0);
-        approachingShapes.Add(newObject);
+        var newShape = new Shape(0 + nXPixelsInGrid / 2, 0);
+        approachingShapes.Add(newShape);
     }
     
     public void ResetGrid()
@@ -62,7 +65,10 @@ public class ShapesOnGrid
     {
         if (isSettled())
         {
-            settledShapes.Add(fallingShape);
+            foreach (var pixel in fallingShape.PixelsInShape)
+            {
+                settledShapes.Add(pixel);
+            }
             approachingShapes.RemoveAt(0);
             SpawnShape();
             fallingShape = approachingShapes[0];
@@ -71,7 +77,7 @@ public class ShapesOnGrid
 
 
         }
-        fallingShape.Y+= 1;
+        fallingShape.moveShape(0,1);
     }
 
     bool isSettled()
