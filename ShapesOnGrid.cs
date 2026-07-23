@@ -13,7 +13,7 @@ public class ShapesOnGrid
     private Shape fallingShape;
     private List<Shape> approachingShapes;
     public int gridSquareSize;
-    private List<Pixel> settledShapes;
+    private List<Pixel> settledPixels;
     
     
     
@@ -32,7 +32,7 @@ public class ShapesOnGrid
                     var (pixelX, pixelY) = gridToWindowCoordinates(pixel.X, pixel.Y);
                         Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, Color.Red);
         }
-        foreach (var obj in settledShapes)
+        foreach (var obj in settledPixels)
         {
             var (gridObjX, gridObjY) = gridToWindowCoordinates(obj.X, obj.Y);
             Raylib.DrawRectangle(gridObjX, gridObjY, Pixel.Width, Pixel.Width, Color.Blue);
@@ -59,15 +59,15 @@ public class ShapesOnGrid
         approachingShapes = [];
         SpawnShape();
         fallingShape= approachingShapes[0];
-        settledShapes = [];
+        settledPixels = [];
     }
     public void enactGravity()
     {
-        if (isSettled())
+        if (isMovementPossible(0,1))
         {
             foreach (var pixel in fallingShape.PixelsInShape)
             {
-                settledShapes.Add(pixel);
+                settledPixels.Add(pixel);
             }
             approachingShapes.RemoveAt(0);
             SpawnShape();
@@ -79,35 +79,27 @@ public class ShapesOnGrid
         }
         fallingShape.moveShape(0,1);
     }
-
-    bool isSettled()
-    {
-        var spaceBeneath = fallingShape.Y + 1;
-        var bottomOfGrid = nYPixelsInGrid;
-        if (spaceBeneath == bottomOfGrid) return true;
-        
-        foreach (var obj in settledShapes)
-        {
-            if (obj.X == fallingShape.X)
-            {
-                    if (obj.Y == spaceBeneath){return true;}
-            }
-        }
-        return false;
-    }
+    
+    //isSettled is a bit like a moveFallingShape but just for y. but only in the check. take the checks and refactor out to their oen boolean.
     
     public void moveFallingShape(int x, int y)
     {
-        var aspiringX = fallingShape.X + x;
-        var aspiringY = fallingShape.Y + y;
-        
-        if (aspiringX is < 0 or > nXPixelsInGrid-1) return;
-        if (aspiringY > nYPixelsInGrid - 1) return;
-        if (settledShapes.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return;
-   
-        fallingShape.X += x;
-        fallingShape.Y += y;
-   
+        isMovementPossible(x, y);
+        fallingShape.moveShape(x, y);
+    }
+
+    public bool isMovementPossible(int x, int y)
+    {
+        foreach (var pixel in fallingShape.PixelsInShape)
+        {
+            var aspiringX = pixel.X + x;
+            var aspiringY = pixel.Y + y;
+
+            if (aspiringX is < 0 or > nXPixelsInGrid - 1) return false;
+            if (aspiringY > nYPixelsInGrid - 1) return false;
+            if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return false;
+        }
+        return true;
     }
 
     void removeFullRows()
@@ -116,13 +108,13 @@ public class ShapesOnGrid
         //check if the row is full
         for (var rowNumber = 0; rowNumber < nYPixelsInGrid; rowNumber++)
         {
-            var shapesInRow = settledShapes.Where((shape) => shape.Y == rowNumber);
+            var shapesInRow = settledPixels.Where((shape) => shape.Y == rowNumber);
             if (shapesInRow.Count() == nXPixelsInGrid)
             {
                 //delete that row
                 //move row above down
-                settledShapes.RemoveAll((ss)=>shapesInRow.Contains(ss));
-                foreach (var ss in settledShapes)
+                settledPixels.RemoveAll((ss)=>shapesInRow.Contains(ss));
+                foreach (var ss in settledPixels)
                 {
                     ss.Y++;
                 }
