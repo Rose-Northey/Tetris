@@ -10,5 +10,9 @@ public class Pixel
     {
         X = x;
         Y = y;
+        
     }
+    
+    //calculate x and y based on where the center of the shape is
+    //DO this within the 
 }

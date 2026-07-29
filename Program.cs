@@ -70,6 +70,8 @@ internal static class Program
         if (Raylib.IsKeyPressed(KeyboardKey.Left)) gameState.ShapesOnGrid.moveFallingShape(-1, 0);
         if (Raylib.IsKeyPressed(KeyboardKey.Right)) gameState.ShapesOnGrid.moveFallingShape(1, 0); 
         if (Raylib.IsKeyPressed(KeyboardKey.Down)) gameState.ShapesOnGrid.moveFallingShape(0, 1);
+        if (Raylib.IsKeyPressed(KeyboardKey.Up)) gameState.ShapesOnGrid.rotateFallingShape(Direction.Clockwise);
+        if (Raylib.IsKeyPressed(KeyboardKey.C)) gameState.ShapesOnGrid.rotateFallingShape(Direction.CounterClockwise);
     }
 
     static void openTetrisInMiddleOfScreen(int windowWidth, int windowHeight)
@@ -85,3 +87,8 @@ internal static class Program
     }
 }
 
+public enum Direction
+{
+    Clockwise = 1,
+    CounterClockwise = -1,
+}

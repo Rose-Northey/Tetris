@@ -8,8 +8,8 @@ public class ShapesOnGrid
     private int nHeight;
     public int xOrigin;
     public int yOrigin;
-    public const int nXPixelsInGrid= 5;
-    public const int nYPixelsInGrid= 10;
+    public const int nXPixelsInGrid= 10;
+    public const int nYPixelsInGrid= 20;
     private Shape fallingShape;
     private List<Shape> approachingShapes;
     public int gridSquareSize;
@@ -63,7 +63,7 @@ public class ShapesOnGrid
     }
     public void enactGravity()
     {
-        if (isMovementPossible(0,1))
+        if (isMovementIllegal(0,1))
         {
             foreach (var pixel in fallingShape.PixelsInShape)
             {
@@ -74,8 +74,6 @@ public class ShapesOnGrid
             fallingShape = approachingShapes[0];
             //check for whether complete row of squares at bottom
             removeFullRows();
-
-
         }
         fallingShape.moveShape(0,1);
     }
@@ -84,22 +82,30 @@ public class ShapesOnGrid
     
     public void moveFallingShape(int x, int y)
     {
-        isMovementPossible(x, y);
+        if(isMovementIllegal(x, y)) return;
         fallingShape.moveShape(x, y);
     }
+    
+    public void rotateFallingShape(Direction direction)
+    {
+        fallingShape.rotateShape(direction);
+    }
+    
+    //rotation: up = clockwise, z = counterclockwise
+    
 
-    public bool isMovementPossible(int x, int y)
+    public bool isMovementIllegal(int x, int y)
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
             var aspiringX = pixel.X + x;
             var aspiringY = pixel.Y + y;
 
-            if (aspiringX is < 0 or > nXPixelsInGrid - 1) return false;
-            if (aspiringY > nYPixelsInGrid - 1) return false;
-            if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return false;
+            if (aspiringX is < 0 or > nXPixelsInGrid - 1) return true;
+            if (aspiringY > nYPixelsInGrid - 1) return true;
+            if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return true;
         }
-        return true;
+        return false;
     }
 
     void removeFullRows()
