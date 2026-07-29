@@ -111,12 +111,14 @@ public class ShapesOnGrid
             var shapesInRow = settledPixels.Where((shape) => shape.Y == rowNumber);
             if (shapesInRow.Count() == nXPixelsInGrid)
             {
-                //delete that row
-                //move row above down
+                //TODO: only move rows down above the row that was full
                 settledPixels.RemoveAll((ss)=>shapesInRow.Contains(ss));
                 foreach (var ss in settledPixels)
                 {
-                    ss.Y++;
+                    if (ss.Y < rowNumber)
+                    {
+                        ss.Y++;
+                    }
                 }
             }
         }
