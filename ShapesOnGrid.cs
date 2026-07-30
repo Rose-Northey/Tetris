@@ -8,7 +8,7 @@ public class ShapesOnGrid
     private int nHeight;
     public int xOrigin;
     public int yOrigin;
-    public const int nXPixelsInGrid= 10;
+    public const int nXPixelsInGrid= 5;
     public const int nYPixelsInGrid= 20;
     private Shape fallingShape;
     private List<Shape> approachingShapes;
@@ -27,11 +27,14 @@ public class ShapesOnGrid
     
     public void DrawFrame()
     {
+       
         foreach (var pixel in fallingShape.PixelsInShape)
         {
                     var (pixelX, pixelY) = gridToWindowCoordinates(pixel.X, pixel.Y);
                         Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, Color.Red);
         }
+        var (fallingShapeX, fallingShapeY) = gridToWindowCoordinates(fallingShape.centerX, fallingShape.centerY);
+        Raylib.DrawRectangle(fallingShapeX, fallingShapeY, 5, 5, Color.Green);
         foreach (var obj in settledPixels)
         {
             var (gridObjX, gridObjY) = gridToWindowCoordinates(obj.X, obj.Y);
@@ -88,11 +91,9 @@ public class ShapesOnGrid
     
     public void rotateFallingShape(Direction direction)
     {
+        if (isRotationMovementIllegal(direction)) return;
         fallingShape.rotateShape(direction);
     }
-    
-    //rotation: up = clockwise, z = counterclockwise
-    
 
     public bool isMovementIllegal(int x, int y)
     {
@@ -108,16 +109,25 @@ public class ShapesOnGrid
         return false;
     }
 
+    public bool isRotationMovementIllegal(Direction direction)
+    {
+        foreach (var pixel in fallingShape.PixelsInShape)
+        {
+            var (aspiringX, aspiringY) = pixel.findRotatedCoordinates(direction, fallingShape.centerX, fallingShape.centerY);
+            if (aspiringX is < 0 or > nXPixelsInGrid - 1) return true;
+            if (aspiringY > nYPixelsInGrid - 1) return true;
+            if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return true;
+        }
+        return false;
+    }
+
     void removeFullRows()
     {
-        //go from 0 to nYPixelsInGrid
-        //check if the row is full
         for (var rowNumber = 0; rowNumber < nYPixelsInGrid; rowNumber++)
         {
             var shapesInRow = settledPixels.Where((shape) => shape.Y == rowNumber);
             if (shapesInRow.Count() == nXPixelsInGrid)
             {
-                //TODO: only move rows down above the row that was full
                 settledPixels.RemoveAll((ss)=>shapesInRow.Contains(ss));
                 foreach (var ss in settledPixels)
                 {
