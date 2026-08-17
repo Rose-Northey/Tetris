@@ -12,15 +12,16 @@ public class Pixel
         Y = y;
 
     }
-
-    //calculate x and y based on where the center of the shape is
-    //DO this within the 
-    public (int, int) findRotatedCoordinates(Direction direction, int centerX, int centerY)
+    
+    public (int, int) findRotatedCoordinates(Direction direction, float centerX, float centerY)
     {
         var xDiff = X - centerX;
         var yDiff = Y - centerY;
-        var aspiringX = centerX - yDiff * (int)direction;
-        var aspiringY = centerY + xDiff * (int)direction;
+        var aspiringXRaw = centerX - yDiff * (int)direction;
+        var aspiringYRaw = centerY + xDiff * (int)direction;
+        var aspiringX = (int)Math.Round(aspiringXRaw); ;
+        var aspiringY = (int)Math.Round(aspiringYRaw);
+    
         return (aspiringX, aspiringY);
     }
 }

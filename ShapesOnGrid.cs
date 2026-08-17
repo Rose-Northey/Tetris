@@ -14,8 +14,7 @@ public class ShapesOnGrid
     private List<Shape> approachingShapes;
     public int gridSquareSize;
     private List<Pixel> settledPixels;
-    
-    
+    // I need to make sure the middle of rotation includes the offset when calculating the rotation
     
     public ShapesOnGrid(int windowWidth, int windowHeight, int pixelWidth)
     {
@@ -27,14 +26,17 @@ public class ShapesOnGrid
     
     public void DrawFrame()
     {
-       
         foreach (var pixel in fallingShape.PixelsInShape)
-        {
-                    var (pixelX, pixelY) = gridToWindowCoordinates(pixel.X, pixel.Y);
-                        Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, Color.Red);
+        { 
+            if (pixel.Y<0) continue;
+            var (pixelX, pixelY) = gridToWindowCoordinates(pixel.X, pixel.Y); 
+            Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, Color.Red);
         }
+        var xOffset = (int)Math.Round((0.5+fallingShape.xOffset)  * Pixel.Width);
+        var yOffset = (int)Math.Round((0.5+fallingShape.yOffset)  * Pixel.Width);
+       
         var (fallingShapeX, fallingShapeY) = gridToWindowCoordinates(fallingShape.centerX, fallingShape.centerY);
-        Raylib.DrawRectangle(fallingShapeX, fallingShapeY, 5, 5, Color.Green);
+        Raylib.DrawRectangle(fallingShapeX+xOffset, fallingShapeY+yOffset, 2, 2, Color.Green);
         foreach (var obj in settledPixels)
         {
             var (gridObjX, gridObjY) = gridToWindowCoordinates(obj.X, obj.Y);
@@ -81,8 +83,6 @@ public class ShapesOnGrid
         fallingShape.moveShape(0,1);
     }
     
-    //isSettled is a bit like a moveFallingShape but just for y. but only in the check. take the checks and refactor out to their oen boolean.
-    
     public void moveFallingShape(int x, int y)
     {
         if(isMovementIllegal(x, y)) return;
@@ -95,7 +95,7 @@ public class ShapesOnGrid
         fallingShape.rotateShape(direction);
     }
 
-    public bool isMovementIllegal(int x, int y)
+    bool isMovementIllegal(int x, int y)
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
@@ -109,7 +109,7 @@ public class ShapesOnGrid
         return false;
     }
 
-    public bool isRotationMovementIllegal(Direction direction)
+    bool isRotationMovementIllegal(Direction direction)
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
