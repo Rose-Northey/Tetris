@@ -1,18 +1,11 @@
 namespace Tetris;
 
-public class Pixel
+public class Pixel(int x, int y)
 {
     public const int Width = 30;
-    public int X { get; set; }
-    public int Y { get; set; }
+    public int X { get; set; } = x;
+    public int Y { get; set; } = y;
 
-    public Pixel(int x, int y)
-    {
-        X = x;
-        Y = y;
-
-    }
-    
     public (int, int) findRotatedCoordinates(Direction direction, float centerX, float centerY)
     {
         var xDiff = X - centerX;

@@ -2,11 +2,11 @@ namespace Tetris;
 
 public class Shape
 {
-    public List<Pixel> PixelsInShape = [];
+    public readonly List<Pixel> PixelsInShape = [];
     public int centerX;
     public int centerY;
-    public float xOffset;
-    public float yOffset;
+    private float xOffset;
+    private float yOffset;
 
     public Shape(int x, int y)
     {
@@ -18,23 +18,43 @@ public class Shape
         formRandomShape();
     }
 
-    public Action GenerateShapeRecipe()
+    private Action GenerateShapeRecipe()
     {
         var randomNumber = new Random().Next(0, 7);
-        switch (randomNumber)
+        return randomNumber switch
         {
-            case(0):return IShape;
-            case(1):return OShape;
-            case(2):return TShape;
-            case(3):return SShape;
-            case(4):return ZShape;
-            case(5):return LShape;
-            default:return JShape;
-        }
-        
+            (0) => IShape,
+            (1) => OShape,
+            (2) => TShape,
+            (3) => SShape,
+            (4) => ZShape,
+            (5) => LShape,
+            _ => JShape
+        };
     }
-    
-    public void IShape()
+
+    public void moveShape(int x, int y)
+    {
+        centerX += x;
+        centerY += y;
+        foreach (var pixel in PixelsInShape)
+        {
+            pixel.X += x;
+            pixel.Y += y;
+        }
+    }
+
+    public void rotateShape(Direction direction)
+    {
+        foreach (var pixel in PixelsInShape)
+        {
+            var (aspiringX, aspiringY) = pixel.findRotatedCoordinates(direction, centerX + xOffset, centerY + yOffset);
+            pixel.X = aspiringX;
+            pixel.Y = aspiringY;
+        }
+    }
+        
+    private void IShape()
     {
         var pixel1 = new Pixel(centerX, centerY - 1);
         var pixel2 = new Pixel(centerX, centerY-2);
@@ -56,7 +76,7 @@ public class Shape
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
     }
 
-    public void TShape()
+    private void TShape()
     {
         var pixel1 = new Pixel(centerX, centerY - 1);
         var pixel2 = new Pixel(centerX - 1, centerY);
@@ -65,7 +85,7 @@ public class Shape
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
     }
 
-    public void SShape()
+    private void SShape()
     {
         var pixel1 = new Pixel(centerX-1, centerY);
         var pixel2 = new Pixel(centerX, centerY);
@@ -74,7 +94,7 @@ public class Shape
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
     }
     
-    public void ZShape()
+    private void ZShape()
     {
         var pixel1 = new Pixel(centerX-1, centerY-1);
         var pixel2 = new Pixel(centerX, centerY-1);
@@ -84,7 +104,7 @@ public class Shape
     }
     
     
-    public void LShape()
+    private void LShape()
     {
         var pixel1 = new Pixel(centerX + 1, centerY - 1);
         var pixel2 = new Pixel(centerX - 1, centerY);
@@ -93,34 +113,12 @@ public class Shape
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
     }
 
-    public void JShape()
+    private void JShape()
     {
         var pixel1 = new Pixel(centerX-1, centerY-1);
         var pixel2 = new Pixel(centerX-1, centerY);
         var pixel3 = new Pixel(centerX, centerY);
         var pixel4 = new Pixel(centerX+1, centerY);
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
-    }
-    
-
-    public void moveShape(int x, int y)
-    {
-        centerX += x;
-        centerY += y;
-        foreach (var pixel in PixelsInShape)
-        {
-            pixel.X += x;
-            pixel.Y += y;
-        }
-    }
-
-    public void rotateShape(Direction direction)
-    {
-        foreach (var pixel in PixelsInShape)
-        {
-            var (aspiringX, aspiringY) = pixel.findRotatedCoordinates(direction, centerX + xOffset, centerY + yOffset);
-            pixel.X = aspiringX;
-            pixel.Y = aspiringY;
-        }
     }
 }

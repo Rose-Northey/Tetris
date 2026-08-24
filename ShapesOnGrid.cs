@@ -6,15 +6,17 @@ public class ShapesOnGrid
 {
     private int nWidth;
     private int nHeight;
-    public int xOrigin;
-    public int yOrigin;
-    public const int nXPixelsInGrid= 5;
-    public const int nYPixelsInGrid= 20;
+    private int xOrigin;
+    private int yOrigin;
+    private const int nXPixelsInGrid= 5;
+    private const int nYPixelsInGrid= 20;
     private Shape fallingShape;
     private List<Shape> approachingShapes;
-    public int gridSquareSize;
+    private int gridSquareSize;
     private List<Pixel> settledPixels;
-    // I need to make sure the middle of rotation includes the offset when calculating the rotation
+    private static readonly Color colourOfGridFill = Color.FromHSV(222, 0.50f, 0.22f);
+    private static readonly Color colourOfGridBorder = Color.FromHSV(188, 0.80f, 0.85f);
+    private static readonly Color colourOfGridLines = Color.FromHSV(222, 0.45f, 0.32f);
     
     public ShapesOnGrid(int windowWidth, int windowHeight, int pixelWidth)
     {
@@ -24,19 +26,35 @@ public class ShapesOnGrid
         ResetGrid();
     }
     
+    private void DrawGrid()
+    {
+        var widthGrid = nXPixelsInGrid * gridSquareSize;
+        var heightGrid = nYPixelsInGrid * gridSquareSize;
+        const int lineWidth = 1;
+        Raylib.DrawRectangle(xOrigin, yOrigin, widthGrid, heightGrid,colourOfGridFill);
+     
+        for (var i = xOrigin; i <= widthGrid+xOrigin; i+= gridSquareSize)
+        {
+            Raylib.DrawRectangle(i, yOrigin,lineWidth, heightGrid, colourOfGridLines);
+        }
+        for (var i = yOrigin; i <= heightGrid + yOrigin; i += gridSquareSize)
+        {
+            Raylib.DrawRectangle(xOrigin, i, widthGrid, lineWidth, colourOfGridLines);
+        }
+        Raylib.DrawRectangleLines(xOrigin-1, yOrigin-1, widthGrid+2, heightGrid+2, colourOfGridBorder);
+    }
+    
+    
     public void DrawFrame()
     {
+        DrawGrid();
         foreach (var pixel in fallingShape.PixelsInShape)
         { 
             if (pixel.Y<0) continue;
             var (pixelX, pixelY) = gridToWindowCoordinates(pixel.X, pixel.Y); 
             Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, Color.Red);
         }
-        var xOffset = (int)Math.Round((0.5+fallingShape.xOffset)  * Pixel.Width);
-        var yOffset = (int)Math.Round((0.5+fallingShape.yOffset)  * Pixel.Width);
-       
-        var (fallingShapeX, fallingShapeY) = gridToWindowCoordinates(fallingShape.centerX, fallingShape.centerY);
-        Raylib.DrawRectangle(fallingShapeX+xOffset, fallingShapeY+yOffset, 2, 2, Color.Green);
+        
         foreach (var obj in settledPixels)
         {
             var (gridObjX, gridObjY) = gridToWindowCoordinates(obj.X, obj.Y);
@@ -51,9 +69,9 @@ public class ShapesOnGrid
         var windowY = gridY * gridSquareSize + yOrigin;
         return (windowX, windowY);
     }
-    
 
-    void SpawnShape()
+
+    private void SpawnShape()
     {
         var newShape = new Shape(0 + nXPixelsInGrid / 2, 0);
         approachingShapes.Add(newShape);
@@ -77,7 +95,6 @@ public class ShapesOnGrid
             approachingShapes.RemoveAt(0);
             SpawnShape();
             fallingShape = approachingShapes[0];
-            //check for whether complete row of squares at bottom
             removeFullRows();
         }
         fallingShape.moveShape(0,1);
@@ -126,15 +143,13 @@ public class ShapesOnGrid
         for (var rowNumber = 0; rowNumber < nYPixelsInGrid; rowNumber++)
         {
             var shapesInRow = settledPixels.Where((shape) => shape.Y == rowNumber);
-            if (shapesInRow.Count() == nXPixelsInGrid)
+            if (shapesInRow.Count() != nXPixelsInGrid) continue;
+            settledPixels.RemoveAll((ss)=>shapesInRow.Contains(ss));
+            foreach (var ss in settledPixels)
             {
-                settledPixels.RemoveAll((ss)=>shapesInRow.Contains(ss));
-                foreach (var ss in settledPixels)
+                if (ss.Y < rowNumber)
                 {
-                    if (ss.Y < rowNumber)
-                    {
-                        ss.Y++;
-                    }
+                    ss.Y++;
                 }
             }
         }

@@ -13,9 +13,7 @@ internal static class Program
     private const int windowHeight = pixelWidth * nYPixelsInWindow;
  
     private static readonly Color colourOfBG= Color.FromHSV(222, 0.55f, 0.18f);
-    private static readonly Color colourOfGridFill = Color.FromHSV(222, 0.50f, 0.22f);
-    private static readonly Color colourOfGridBorder = Color.FromHSV(188, 0.80f, 0.85f);
-    private static readonly Color colourOfGridLines = Color.FromHSV(222, 0.45f, 0.32f);
+
 
     public static void Main()
     {
@@ -28,30 +26,12 @@ internal static class Program
             gameState.gameTime += Raylib.GetFrameTime();
             Raylib.BeginDrawing();
             Raylib.ClearBackground(colourOfBG);
-            DrawGrid(gameState.ShapesOnGrid.xOrigin,gameState.ShapesOnGrid.yOrigin, gameState.ShapesOnGrid);
+            // DrawGrid(gameState.ShapesOnGrid.xOrigin,gameState.ShapesOnGrid.yOrigin, gameState.ShapesOnGrid);
             
             PlayTetris(gameState);
             Raylib.EndDrawing();
         }
         Raylib.CloseWindow();
-    }
-
-    private static void DrawGrid(int x, int y, ShapesOnGrid shapesOnGrid)
-    {
-        var widthGrid = ShapesOnGrid.nXPixelsInGrid * shapesOnGrid.gridSquareSize;
-        var heightGrid = ShapesOnGrid.nYPixelsInGrid * shapesOnGrid.gridSquareSize;
-        const int lineWidth = 1;
-        Raylib.DrawRectangle(x, y, widthGrid, heightGrid,colourOfGridFill);
-     
-        for (var i = x; i <= widthGrid+x; i+=pixelWidth)
-        {
-            Raylib.DrawRectangle(i, y,lineWidth, heightGrid, colourOfGridLines);
-        }
-        for (var i = y; i <= heightGrid + y; i += pixelWidth)
-        {
-            Raylib.DrawRectangle(x, i, widthGrid, lineWidth, colourOfGridLines);
-        }
-        Raylib.DrawRectangleLines(x-1, y-1, widthGrid+2, heightGrid+2, colourOfGridBorder);
     }
 
     private static void PlayTetris(GameState gameState)
