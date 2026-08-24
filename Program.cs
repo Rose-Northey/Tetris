@@ -17,8 +17,10 @@ internal static class Program
 
     public static void Main()
     {
-        var gameState = new GameState();
-        gameState.ShapesOnGrid = new ShapesOnGrid(windowWidth,windowHeight, pixelWidth);
+        var gameState = new GameState
+        {
+            ShapesOnGrid = new ShapesOnGrid(windowWidth,windowHeight, pixelWidth)
+        };
         gameState.Reset();
         openTetrisInMiddleOfScreen(windowWidth, windowHeight);
         while (!Raylib.WindowShouldClose())

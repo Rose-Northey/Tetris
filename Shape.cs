@@ -56,6 +56,7 @@ public class Shape
         
     private void IShape()
     {
+        centerY -= 1;
         var pixel1 = new Pixel(centerX, centerY - 1);
         var pixel2 = new Pixel(centerX, centerY-2);
         var pixel3 = new Pixel(centerX, centerY);
@@ -65,7 +66,7 @@ public class Shape
         PixelsInShape.AddRange(pixel1,pixel2, pixel3,pixel4);
     }
     
-    public void OShape()
+    private void OShape()
     {
         var pixel1 = new Pixel(centerX - 1, centerY - 1);
         var pixel2 = new Pixel(centerX, centerY - 1);
@@ -110,6 +111,7 @@ public class Shape
         var pixel2 = new Pixel(centerX - 1, centerY);
         var pixel3 = new Pixel(centerX, centerY);
         var pixel4 = new Pixel(centerX + 1, centerY);
+        
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
     }
 

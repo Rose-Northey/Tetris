@@ -9,7 +9,7 @@ public class ShapesOnGrid
     private int xOrigin;
     private int yOrigin;
     private const int nXPixelsInGrid= 5;
-    private const int nYPixelsInGrid= 20;
+    private const int nYPixelsInGrid= 5;
     private Shape fallingShape;
     private List<Shape> approachingShapes;
     private int gridSquareSize;
@@ -73,7 +73,7 @@ public class ShapesOnGrid
 
     private void SpawnShape()
     {
-        var newShape = new Shape(0 + nXPixelsInGrid / 2, 0);
+        var newShape = new Shape(nXPixelsInGrid / 2, -1);
         approachingShapes.Add(newShape);
     }
     
@@ -96,6 +96,7 @@ public class ShapesOnGrid
             SpawnShape();
             fallingShape = approachingShapes[0];
             removeFullRows();
+            return;
         }
         fallingShape.moveShape(0,1);
     }
