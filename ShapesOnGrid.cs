@@ -9,7 +9,7 @@ public class ShapesOnGrid
     private int xOrigin;
     private int yOrigin;
     private const int nXPixelsInGrid= 5;
-    private const int nYPixelsInGrid= 5;
+    private const int nYPixelsInGrid= 10;
     private Shape fallingShape;
     private List<Shape> approachingShapes;
     private int gridSquareSize;
@@ -52,13 +52,13 @@ public class ShapesOnGrid
         { 
             if (pixel.Y<0) continue;
             var (pixelX, pixelY) = gridToWindowCoordinates(pixel.X, pixel.Y); 
-            Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, Color.Red);
+            Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, pixel.color);
         }
         
         foreach (var obj in settledPixels)
         {
             var (gridObjX, gridObjY) = gridToWindowCoordinates(obj.X, obj.Y);
-            Raylib.DrawRectangle(gridObjX, gridObjY, Pixel.Width, Pixel.Width, Color.Blue);
+            Raylib.DrawRectangle(gridObjX, gridObjY, Pixel.Width, Pixel.Width, obj.color);
         }
         
     }
@@ -90,6 +90,8 @@ public class ShapesOnGrid
         {
             foreach (var pixel in fallingShape.PixelsInShape)
             {
+                pixel.color.GetHSV(out var h, out var s, out var v);
+                pixel.color = Color.FromHSV(h, s - 0.1f, v - 0.1f);
                 settledPixels.Add(pixel);
             }
             approachingShapes.RemoveAt(0);
@@ -131,7 +133,8 @@ public class ShapesOnGrid
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
-            var (aspiringX, aspiringY) = pixel.findRotatedCoordinates(direction, fallingShape.centerX, fallingShape.centerY);
+            var (aspiringX, aspiringY) = pixel.findRotatedCoordinates(direction, fallingShape.centerX, fallingShape.centerY, fallingShape.xOffset, fallingShape.yOffset);
+            //value is less than 0 or something
             if (aspiringX is < 0 or > nXPixelsInGrid - 1) return true;
             if (aspiringY > nYPixelsInGrid - 1) return true;
             if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return true;

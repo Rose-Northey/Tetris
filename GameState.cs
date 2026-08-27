@@ -8,7 +8,7 @@ public class GameState
     public void Reset()
     {
         gameTime = 0;
-        gameSpeed = 2f;
+        gameSpeed = 1f;
         ShapesOnGrid.ResetGrid();
         
     }
