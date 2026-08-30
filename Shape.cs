@@ -5,10 +5,10 @@ namespace Tetris;
 public class Shape
 {
     public readonly List<Pixel> PixelsInShape = [];
-    public int centerX;
-    public int centerY;
-    public float xOffset;
-    public float yOffset;
+    private int centerX;
+    private int centerY;
+    private float xOffset;
+    private float yOffset;
 
     public Shape(int x, int y)
     {
@@ -16,7 +16,8 @@ public class Shape
         centerY = y;
         xOffset = 0;
         yOffset = 0;
-        IShape();
+        var buildShape = GenerateShapeRecipe();
+        buildShape();
         colorShape();
     }
 
@@ -81,23 +82,37 @@ public class Shape
     {
         foreach (var pixel in PixelsInShape)
         {
-            var (aspiringX, aspiringY) = pixel.findRotatedCoordinates(direction, centerX, centerY, xOffset, yOffset);
+            //pass in whole pixel?
+            var (aspiringX, aspiringY) = findRotatedCoordinates(direction, pixel);
             pixel.X = aspiringX;
             pixel.Y = aspiringY;
         }
+    }
+    
+    public (int, int) findRotatedCoordinates(Direction direction, Pixel pixel)
+    {
+        var calculatedCenterX = centerX + xOffset;
+        var calculatedCenterY = centerY + yOffset;
+        var xDiff = pixel.X - calculatedCenterX;
+        var yDiff = pixel.Y - calculatedCenterY;
+        var aspiringXRaw = calculatedCenterX - yDiff * (int)direction;
+        var aspiringYRaw = calculatedCenterY + xDiff * (int)direction;
+        var aspiringX = (int)Math.Round(aspiringXRaw); ;
+        var aspiringY = (int)Math.Round(aspiringYRaw);
+    
+        return (aspiringX, aspiringY);
     }
         
     private void IShape()
     {
         centerY -= 1;
         var pixel1 = new Pixel(centerX, centerY - 1);
-        // var pixel2 = new Pixel(centerX, centerY-2);
+        var pixel2 = new Pixel(centerX, centerY-2);
         var pixel3 = new Pixel(centerX, centerY);
-        // var pixel4 = new Pixel(centerX, centerY+1);   
+        var pixel4 = new Pixel(centerX, centerY+1);   
         xOffset = -0.5F;
         yOffset = -0.5F;
-        // PixelsInShape.AddRange(pixel1,pixel2, pixel3,pixel4);
-        PixelsInShape.AddRange(pixel1,pixel3);
+        PixelsInShape.AddRange(pixel1,pixel2, pixel3,pixel4);
     }
     
     private void OShape()

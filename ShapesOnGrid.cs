@@ -9,9 +9,9 @@ public class ShapesOnGrid
     private int xOrigin;
     private int yOrigin;
     private const int nXPixelsInGrid= 5;
-    private const int nYPixelsInGrid= 10;
+    private const int nYPixelsInGrid= 15;
     private Shape fallingShape;
-    private List<Shape> approachingShapes;
+    private Queue<Shape> waitingShapes;
     private int gridSquareSize;
     private List<Pixel> settledPixels;
     private static readonly Color colourOfGridFill = Color.FromHSV(222, 0.50f, 0.22f);
@@ -55,10 +55,21 @@ public class ShapesOnGrid
             Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, pixel.color);
         }
         
-        foreach (var obj in settledPixels)
+        foreach (var pixel in settledPixels)
         {
-            var (gridObjX, gridObjY) = gridToWindowCoordinates(obj.X, obj.Y);
-            Raylib.DrawRectangle(gridObjX, gridObjY, Pixel.Width, Pixel.Width, obj.color);
+            var (gridObjX, gridObjY) = gridToWindowCoordinates(pixel.X, pixel.Y);
+            Raylib.DrawRectangle(gridObjX, gridObjY, Pixel.Width, Pixel.Width, pixel.color);
+        }
+
+        foreach (var shape in waitingShapes)
+        {
+            // First shape should be placed at LHS of board + 2
+            //COM of shape
+            // var waitingCenterY = 
+            foreach (var pixel in shape.PixelsInShape)
+            {
+                
+            }
         }
         
     }
@@ -74,14 +85,18 @@ public class ShapesOnGrid
     private void SpawnShape()
     {
         var newShape = new Shape(nXPixelsInGrid / 2, -1);
-        approachingShapes.Add(newShape);
+        waitingShapes.Enqueue(newShape);
     }
     
     public void ResetGrid()
     {
-        approachingShapes = [];
+        waitingShapes = [];
         SpawnShape();
-        fallingShape= approachingShapes[0];
+        SpawnShape();
+        SpawnShape();
+        SpawnShape();
+        SpawnShape();
+        fallingShape = waitingShapes.Dequeue();
         settledPixels = [];
     }
     public void enactGravity()
@@ -94,9 +109,9 @@ public class ShapesOnGrid
                 pixel.color = Color.FromHSV(h, s - 0.1f, v - 0.1f);
                 settledPixels.Add(pixel);
             }
-            approachingShapes.RemoveAt(0);
+
+            fallingShape = waitingShapes.Dequeue();
             SpawnShape();
-            fallingShape = approachingShapes[0];
             removeFullRows();
             return;
         }
@@ -133,7 +148,7 @@ public class ShapesOnGrid
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
-            var (aspiringX, aspiringY) = pixel.findRotatedCoordinates(direction, fallingShape.centerX, fallingShape.centerY, fallingShape.xOffset, fallingShape.yOffset);
+            var (aspiringX, aspiringY) = fallingShape.findRotatedCoordinates(direction, pixel);
             //value is less than 0 or something
             if (aspiringX is < 0 or > nXPixelsInGrid - 1) return true;
             if (aspiringY > nYPixelsInGrid - 1) return true;
