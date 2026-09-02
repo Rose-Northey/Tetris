@@ -5,8 +5,8 @@ namespace Tetris;
 public class Shape
 {
     public readonly List<Pixel> PixelsInShape = [];
-    private int centerX;
-    private int centerY;
+    public int centerX;//grid coordinates
+    public int centerY;
     private float xOffset;
     private float yOffset;
 

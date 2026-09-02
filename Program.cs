@@ -28,9 +28,17 @@ internal static class Program
             gameState.gameTime += Raylib.GetFrameTime();
             Raylib.BeginDrawing();
             Raylib.ClearBackground(colourOfBG);
-            // DrawGrid(gameState.ShapesOnGrid.xOrigin,gameState.ShapesOnGrid.yOrigin, gameState.ShapesOnGrid);
             
-            PlayTetris(gameState);
+            switch (gameState.gameStatus)
+            {
+                case GameStatus.Playing: PlayTetris(gameState);
+                    break;
+                case GameStatus.GameOver: Menus.DrawGameOver();
+                    break;
+                default: throw new ArgumentOutOfRangeException();
+            }
+            
+            
             Raylib.EndDrawing();
         }
         Raylib.CloseWindow();
@@ -40,11 +48,10 @@ internal static class Program
     {
         gameState.ShapesOnGrid.DrawFrame();
         handleInput(gameState);
-        // keyboard press
         if (gameState.gameTime <= gameState.gameSpeed) return;
         gameState.gameTime = 0; 
         gameState.ShapesOnGrid.enactGravity();
-        
+        if (gameState.ShapesOnGrid.isGameOver()) gameState.gameStatus = GameStatus.GameOver;
     }
 
     private static void handleInput(GameState gameState)
