@@ -9,7 +9,7 @@ public class ShapesOnGrid
     private int xOrigin;
     private int yOrigin;
     private const int nXPixelsInGrid= 5;
-    private const int nYPixelsInGrid= 15;
+    private const int nYPixelsInGrid= 1;
     private Shape fallingShape;
     private Queue<Shape> waitingShapes;
     private int gridSquareSize;
@@ -61,15 +61,26 @@ public class ShapesOnGrid
             Raylib.DrawRectangle(gridObjX, gridObjY, Pixel.Width, Pixel.Width, pixel.color);
         }
 
+  
+        const int rightHandEdgeOfGameGrid = nXPixelsInGrid;
+        const int topOfGameGrid = 1;
+        var(rightHandEdgeOfGameGridCanvas,topOfGameGridCanvas) = gridToWindowCoordinates(rightHandEdgeOfGameGrid, topOfGameGrid);
+        var centerX = rightHandEdgeOfGameGridCanvas + 10;
+        var centerY = topOfGameGridCanvas - 15;
+                    
         foreach (var shape in waitingShapes)
         {
-            // First shape should be placed at LHS of board + 2
-            //COM of shape
-            // var waitingCenterY = 
             foreach (var pixel in shape.PixelsInShape)
             {
+                var diffX = pixel.X - shape.centerX;
+                var diffY = pixel.Y - shape.centerY;
                 
+                var gridObjX = centerX + diffX*6;
+                var gridObjY = centerY + diffY*6;
+
+                Raylib.DrawRectangle(gridObjX, gridObjY, 6, 6, pixel.color);
             }
+            centerY += 30;
         }
         
     }
@@ -115,7 +126,7 @@ public class ShapesOnGrid
             removeFullRows();
             return;
         }
-        fallingShape.moveShape(0,1);
+        // fallingShape.moveShape(0,1);
     }
     
     public void moveFallingShape(int x, int y)
@@ -128,6 +139,15 @@ public class ShapesOnGrid
     {
         if (isRotationMovementIllegal(direction)) return;
         fallingShape.rotateShape(direction);
+    }
+
+    public bool isGameOver()
+    {
+        foreach (var pixel in settledPixels)
+        {
+            if (pixel.Y < 0) return true;
+        }
+        return false;
     }
 
     bool isMovementIllegal(int x, int y)
