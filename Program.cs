@@ -33,7 +33,7 @@ internal static class Program
             {
                 case GameStatus.Playing: PlayTetris(gameState);
                     break;
-                case GameStatus.GameOver: Menus.DrawGameOver();
+                case GameStatus.GameOver: GameOverExperience(gameState);
                     break;
                 default: throw new ArgumentOutOfRangeException();
             }
@@ -47,11 +47,23 @@ internal static class Program
     private static void PlayTetris(GameState gameState)
     {
         gameState.ShapesOnGrid.DrawFrame();
+        gameState.ShapesOnGrid.DrawScore();
         handleInput(gameState);
         if (gameState.gameTime <= gameState.gameSpeed) return;
-        gameState.gameTime = 0; 
-        gameState.ShapesOnGrid.enactGravity();
+        gameState.gameTime = 0;
+        Raylib.DrawText(gameState.score.ToString(), 100, 150, 10, Color.White);
+        gameState.score += gameState.ShapesOnGrid.PlaySingleFrame();
+
+        
         if (gameState.ShapesOnGrid.isGameOver()) gameState.gameStatus = GameStatus.GameOver;
+    }
+
+    private static void GameOverExperience(GameState gameState)
+    {
+        Menus.DrawGameOver();
+        if (Raylib.GetKeyPressed() == 0) return;
+        gameState.Reset();
+        
     }
 
     private static void handleInput(GameState gameState)

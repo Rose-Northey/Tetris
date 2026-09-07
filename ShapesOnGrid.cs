@@ -9,7 +9,7 @@ public class ShapesOnGrid
     private int xOrigin;
     private int yOrigin;
     private const int nXPixelsInGrid= 5;
-    private const int nYPixelsInGrid= 1;
+    private const int nYPixelsInGrid= 10;
     private Shape fallingShape;
     private Queue<Shape> waitingShapes;
     private int gridSquareSize;
@@ -17,6 +17,7 @@ public class ShapesOnGrid
     private static readonly Color colourOfGridFill = Color.FromHSV(222, 0.50f, 0.22f);
     private static readonly Color colourOfGridBorder = Color.FromHSV(188, 0.80f, 0.85f);
     private static readonly Color colourOfGridLines = Color.FromHSV(222, 0.45f, 0.32f);
+    private int singleFrameScore;
     
     public ShapesOnGrid(int windowWidth, int windowHeight, int pixelWidth)
     {
@@ -42,6 +43,19 @@ public class ShapesOnGrid
             Raylib.DrawRectangle(xOrigin, i, widthGrid, lineWidth, colourOfGridLines);
         }
         Raylib.DrawRectangleLines(xOrigin-1, yOrigin-1, widthGrid+2, heightGrid+2, colourOfGridBorder);
+    }
+
+    public void DrawScore()
+    {
+        var (leftOfGrid, bottomOfGrid) = gridToWindowCoordinates(0, nYPixelsInGrid);
+        
+        Raylib.DrawText($"Score: {singleFrameScore}", leftOfGrid, bottomOfGrid+15, 10, Color.White);
+    }
+
+    public int PlaySingleFrame()
+    {
+        enactGravity();
+        return singleFrameScore;
     }
     
     
@@ -112,26 +126,17 @@ public class ShapesOnGrid
     }
     public void enactGravity()
     {
-        if (isMovementIllegal(0,1))
+        if (isMovementAllowed(0, 1))
         {
-            foreach (var pixel in fallingShape.PixelsInShape)
-            {
-                pixel.color.GetHSV(out var h, out var s, out var v);
-                pixel.color = Color.FromHSV(h, s - 0.1f, v - 0.1f);
-                settledPixels.Add(pixel);
-            }
-
-            fallingShape = waitingShapes.Dequeue();
-            SpawnShape();
-            removeFullRows();
+            fallingShape.moveShape(0, 1);
             return;
         }
-        // fallingShape.moveShape(0,1);
+        setFallingShape();
     }
     
     public void moveFallingShape(int x, int y)
     {
-        if(isMovementIllegal(x, y)) return;
+        if(!isMovementAllowed(x, y)) return;
         fallingShape.moveShape(x, y);
     }
     
@@ -139,6 +144,19 @@ public class ShapesOnGrid
     {
         if (isRotationMovementIllegal(direction)) return;
         fallingShape.rotateShape(direction);
+    }
+
+    private void setFallingShape()
+    {
+        foreach (var pixel in fallingShape.PixelsInShape)
+        {
+            pixel.color.GetHSV(out var h, out var s, out var v);
+            pixel.color = Color.FromHSV(h, s - 0.1f, v - 0.1f);
+            settledPixels.Add(pixel);
+        }
+        fallingShape = waitingShapes.Dequeue();
+        SpawnShape();
+        removeFullRows();
     }
 
     public bool isGameOver()
@@ -150,18 +168,18 @@ public class ShapesOnGrid
         return false;
     }
 
-    bool isMovementIllegal(int x, int y)
+    bool isMovementAllowed(int x, int y)
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
             var aspiringX = pixel.X + x;
             var aspiringY = pixel.Y + y;
 
-            if (aspiringX is < 0 or > nXPixelsInGrid - 1) return true;
-            if (aspiringY > nYPixelsInGrid - 1) return true;
-            if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return true;
+            if (aspiringX is < 0 or > nXPixelsInGrid - 1) return false;
+            if (aspiringY > nYPixelsInGrid - 1) return false;
+            if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return false;
         }
-        return false;
+        return true;
     }
 
     bool isRotationMovementIllegal(Direction direction)
@@ -169,7 +187,6 @@ public class ShapesOnGrid
         foreach (var pixel in fallingShape.PixelsInShape)
         {
             var (aspiringX, aspiringY) = fallingShape.findRotatedCoordinates(direction, pixel);
-            //value is less than 0 or something
             if (aspiringX is < 0 or > nXPixelsInGrid - 1) return true;
             if (aspiringY > nYPixelsInGrid - 1) return true;
             if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return true;
@@ -181,16 +198,28 @@ public class ShapesOnGrid
     {
         for (var rowNumber = 0; rowNumber < nYPixelsInGrid; rowNumber++)
         {
-            var shapesInRow = settledPixels.Where((shape) => shape.Y == rowNumber);
-            if (shapesInRow.Count() != nXPixelsInGrid) continue;
-            settledPixels.RemoveAll((ss)=>shapesInRow.Contains(ss));
-            foreach (var ss in settledPixels)
+            var pixelsInRow = settledPixels.Where((shape) => shape.Y == rowNumber);
+            if (isRowFull(pixelsInRow)) continue;
+            singleFrameScore += 10;
+            settledPixels.RemoveAll((pixel)=>pixelsInRow.Contains(pixel));
+            moveSettledPixelsDown(rowNumber);
+        }
+    }
+
+    bool isRowFull(IEnumerable<Pixel> pixelsInRow)
+    {
+        return pixelsInRow.Count() != nXPixelsInGrid;
+    }
+
+    void moveSettledPixelsDown(int removedRowNumber)
+    {
+        foreach (var settledPixel in settledPixels)
+        {
+            if (settledPixel.Y < removedRowNumber)
             {
-                if (ss.Y < rowNumber)
-                {
-                    ss.Y++;
-                }
+                settledPixel.Y++;
             }
         }
     }
 }
+

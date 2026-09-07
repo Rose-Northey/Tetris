@@ -9,4 +9,5 @@ public static class Menus
         Raylib.DrawText("Game Over", 100, 100, 20, Color.Red);
         Raylib.DrawText("Press any key to restart", 100, 150, 10, Color.White);
     }
+    
 }
