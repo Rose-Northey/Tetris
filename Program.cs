@@ -21,6 +21,7 @@ internal static class Program
         {
             ShapesOnGrid = new ShapesOnGrid(windowWidth,windowHeight, pixelWidth)
         };
+        gameState.ShapesOnGrid.setScore = gameState.onRowDeleted;
         gameState.Reset();
         openTetrisInMiddleOfScreen(windowWidth, windowHeight);
         while (!Raylib.WindowShouldClose())
@@ -44,10 +45,12 @@ internal static class Program
         Raylib.CloseWindow();
     }
 
+  
+
     private static void PlayTetris(GameState gameState)
     {
         gameState.ShapesOnGrid.DrawFrame();
-        gameState.ShapesOnGrid.DrawScore();
+        DrawScore(gameState.score);
         handleInput(gameState);
         if (gameState.gameTime <= gameState.gameSpeed) return;
         gameState.gameTime = 0;
@@ -63,6 +66,14 @@ internal static class Program
         Menus.DrawGameOver();
         if (Raylib.GetKeyPressed() == 0) return;
         gameState.Reset();
+        
+    }
+    public static void DrawScore(int score)
+    {
+        // var (leftOfGrid, bottomOfGrid) = gridToWindowCoordinates(0, nYPixelsInGrid);
+        //
+        // Raylib.DrawText($"Score: {singleFrameScore}", leftOfGrid, bottomOfGrid+15, 10, Color.White);
+        Raylib.DrawText($"Score: {score}", 0, 0, 10, Color.White);
         
     }
 

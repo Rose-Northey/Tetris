@@ -15,6 +15,11 @@ public class GameState
         gameStatus = GameStatus.Playing;
         score = 0;
     }
+    
+    public void onRowDeleted(int scoreChange)
+    {
+        score += scoreChange;
+    }
 }
 //the thing I should do with my life is to make a game because I want to, and then I will be the best
 //i can solve my problems by making games, and then I will be the best

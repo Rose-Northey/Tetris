@@ -18,6 +18,12 @@ public class ShapesOnGrid
     private static readonly Color colourOfGridBorder = Color.FromHSV(188, 0.80f, 0.85f);
     private static readonly Color colourOfGridLines = Color.FromHSV(222, 0.45f, 0.32f);
     private int singleFrameScore;
+    public Action <int> setScore;
+    private int rowClearPoints = 10;
+    //have a method which will set the score in Gamestate
+    //set this method from program after the construction
+    //have a blank function before the new one is set
+  
     
     public ShapesOnGrid(int windowWidth, int windowHeight, int pixelWidth)
     {
@@ -25,6 +31,7 @@ public class ShapesOnGrid
         yOrigin = (windowHeight - pixelWidth * nYPixelsInGrid) / 2;
         gridSquareSize = pixelWidth;
         ResetGrid();
+        setScore = (s) => {};
     }
     
     private void DrawGrid()
@@ -44,13 +51,7 @@ public class ShapesOnGrid
         }
         Raylib.DrawRectangleLines(xOrigin-1, yOrigin-1, widthGrid+2, heightGrid+2, colourOfGridBorder);
     }
-
-    public void DrawScore()
-    {
-        var (leftOfGrid, bottomOfGrid) = gridToWindowCoordinates(0, nYPixelsInGrid);
-        
-        Raylib.DrawText($"Score: {singleFrameScore}", leftOfGrid, bottomOfGrid+15, 10, Color.White);
-    }
+    
 
     public int PlaySingleFrame()
     {
@@ -200,7 +201,7 @@ public class ShapesOnGrid
         {
             var pixelsInRow = settledPixels.Where((shape) => shape.Y == rowNumber);
             if (isRowFull(pixelsInRow)) continue;
-            singleFrameScore += 10;
+            setScore(rowClearPoints);
             settledPixels.RemoveAll((pixel)=>pixelsInRow.Contains(pixel));
             moveSettledPixelsDown(rowNumber);
         }
