@@ -21,7 +21,7 @@ internal static class Program
         {
             ShapesOnGrid = new ShapesOnGrid(windowWidth,windowHeight, pixelWidth)
         };
-        gameState.ShapesOnGrid.setScore = gameState.onRowDeleted;
+        gameState.ShapesOnGrid.onRowClear = gameState.onRowClear;
         gameState.Reset();
         openTetrisInMiddleOfScreen(windowWidth, windowHeight);
         while (!Raylib.WindowShouldClose())
@@ -55,8 +55,7 @@ internal static class Program
         if (gameState.gameTime <= gameState.gameSpeed) return;
         gameState.gameTime = 0;
         Raylib.DrawText(gameState.score.ToString(), 100, 150, 10, Color.White);
-        gameState.score += gameState.ShapesOnGrid.PlaySingleFrame();
-
+        gameState.ShapesOnGrid.PlaySingleFrame();
         
         if (gameState.ShapesOnGrid.isGameOver()) gameState.gameStatus = GameStatus.GameOver;
     }

@@ -3,10 +3,12 @@ namespace Tetris;
 public class GameState
 {
     public ShapesOnGrid ShapesOnGrid;
+    public Grid grid;
     public float gameTime;
     public float gameSpeed;
     public GameStatus gameStatus;
     public int score;
+    private int rowClearPoints = 10;
     public void Reset()
     {
         gameTime = 0;
@@ -16,9 +18,9 @@ public class GameState
         score = 0;
     }
     
-    public void onRowDeleted(int scoreChange)
+    public void onRowClear()
     {
-        score += scoreChange;
+        score += rowClearPoints;
     }
 }
 //the thing I should do with my life is to make a game because I want to, and then I will be the best

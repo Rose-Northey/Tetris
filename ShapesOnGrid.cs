@@ -18,11 +18,7 @@ public class ShapesOnGrid
     private static readonly Color colourOfGridBorder = Color.FromHSV(188, 0.80f, 0.85f);
     private static readonly Color colourOfGridLines = Color.FromHSV(222, 0.45f, 0.32f);
     private int singleFrameScore;
-    public Action <int> setScore;
-    private int rowClearPoints = 10;
-    //have a method which will set the score in Gamestate
-    //set this method from program after the construction
-    //have a blank function before the new one is set
+    public Action onRowClear;
   
     
     public ShapesOnGrid(int windowWidth, int windowHeight, int pixelWidth)
@@ -31,7 +27,7 @@ public class ShapesOnGrid
         yOrigin = (windowHeight - pixelWidth * nYPixelsInGrid) / 2;
         gridSquareSize = pixelWidth;
         ResetGrid();
-        setScore = (s) => {};
+        onRowClear = () => {};
     }
     
     private void DrawGrid()
@@ -53,10 +49,9 @@ public class ShapesOnGrid
     }
     
 
-    public int PlaySingleFrame()
+    public void PlaySingleFrame()
     {
         enactGravity();
-        return singleFrameScore;
     }
     
     
@@ -97,7 +92,6 @@ public class ShapesOnGrid
             }
             centerY += 30;
         }
-        
     }
 
     private (int, int) gridToWindowCoordinates(int gridX, int gridY)
@@ -125,7 +119,8 @@ public class ShapesOnGrid
         fallingShape = waitingShapes.Dequeue();
         settledPixels = [];
     }
-    public void enactGravity()
+
+    private void enactGravity()
     {
         if (isMovementAllowed(0, 1))
         {
@@ -201,7 +196,7 @@ public class ShapesOnGrid
         {
             var pixelsInRow = settledPixels.Where((shape) => shape.Y == rowNumber);
             if (isRowFull(pixelsInRow)) continue;
-            setScore(rowClearPoints);
+            onRowClear();
             settledPixels.RemoveAll((pixel)=>pixelsInRow.Contains(pixel));
             moveSettledPixelsDown(rowNumber);
         }
