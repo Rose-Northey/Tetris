@@ -9,6 +9,7 @@ public class Shape
     public int centerY;
     private float xOffset;
     private float yOffset;
+    private Orientation orientation;
 
     public Shape(int x, int y)
     {
@@ -19,6 +20,7 @@ public class Shape
         var buildShape = GenerateShapeRecipe();
         buildShape();
         colorShape();
+        orientation = Orientation.zero;
     }
 
     private Color GenerateColor()
@@ -82,11 +84,34 @@ public class Shape
     {
         foreach (var pixel in PixelsInShape)
         {
-            //pass in whole pixel?
             var (aspiringX, aspiringY) = findRotatedCoordinates(direction, pixel);
             pixel.X = aspiringX;
             pixel.Y = aspiringY;
         }
+        ChangeOrientation(direction);
+    }
+
+    public void ChangeOrientation(Direction direction)
+    {
+        if (direction == Direction.Clockwise)
+        {
+            orientation = orientation switch
+            {
+                Orientation.zero => Orientation.right,
+                Orientation.right => Orientation.two,
+                Orientation.two => Orientation.left,
+                _ => Orientation.zero
+            };
+            return;
+        }
+
+        orientation = orientation switch
+        {
+            Orientation.zero => Orientation.left,
+            Orientation.left => Orientation.two,
+            Orientation.two => Orientation.right,
+            _ => Orientation.zero
+        };
     }
     
     public (int, int) findRotatedCoordinates(Direction direction, Pixel pixel)
@@ -172,4 +197,8 @@ public class Shape
         var pixel4 = new Pixel(centerX+1, centerY);
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
     }
+}
+
+public enum Orientation{
+zero, left, two, right
 }
