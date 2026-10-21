@@ -9,7 +9,8 @@ public class Shape
     public int centerY;
     private float xOffset;
     private float yOffset;
-    private Orientation orientation;
+    private Orientation currentOrientation;
+    public readonly Dictionary<WallKickData, Orientation> wallKickLookup;
 
     public Shape(int x, int y)
     {
@@ -20,7 +21,8 @@ public class Shape
         var buildShape = GenerateShapeRecipe();
         buildShape();
         colorShape();
-        orientation = Orientation.zero;
+        currentOrientation = Orientation.zero;
+
     }
 
     private Color GenerateColor()
@@ -44,14 +46,6 @@ public class Shape
         {
             pixel.color = randomColor;
         }
-    }
-    
-    static float NextFloat(Random random)
-    {
-        double mantissa = (random.NextDouble() * 2.0) - 1.0;
-        // choose -149 instead of -126 to also generate subnormal floats (*)
-        double exponent = Math.Pow(2.0, random.Next(-126, 128));
-        return (float)(mantissa * exponent);
     }
     
     private Action GenerateShapeRecipe()
@@ -82,36 +76,41 @@ public class Shape
 
     public void rotateShape(Direction direction)
     {
+        var prospectiveOrientation = FindNewOrientation(direction);
+        //find prospective so we can use it in the wallkick data
+        //figure out whether the rotation will work first
+        //if the rotation won't work, try each wall kick translation otherwise, do nothing
         foreach (var pixel in PixelsInShape)
         {
             var (aspiringX, aspiringY) = findRotatedCoordinates(direction, pixel);
             pixel.X = aspiringX;
             pixel.Y = aspiringY;
         }
-        ChangeOrientation(direction);
+        
     }
 
-    public void ChangeOrientation(Direction direction)
+    private Orientation FindNewOrientation(Direction direction)
     {
+        Orientation newOrientation;
         if (direction == Direction.Clockwise)
         {
-            orientation = orientation switch
+            newOrientation = currentOrientation switch
             {
                 Orientation.zero => Orientation.right,
                 Orientation.right => Orientation.two,
                 Orientation.two => Orientation.left,
                 _ => Orientation.zero
             };
-            return;
+        } else {
+            newOrientation = currentOrientation switch
+            {
+                Orientation.zero => Orientation.left,
+                Orientation.left => Orientation.two,
+                Orientation.two => Orientation.right,
+                _ => Orientation.zero
+            };
         }
-
-        orientation = orientation switch
-        {
-            Orientation.zero => Orientation.left,
-            Orientation.left => Orientation.two,
-            Orientation.two => Orientation.right,
-            _ => Orientation.zero
-        };
+        return newOrientation;
     }
     
     public (int, int) findRotatedCoordinates(Direction direction, Pixel pixel)
@@ -138,6 +137,7 @@ public class Shape
         xOffset = -0.5F;
         yOffset = -0.5F;
         PixelsInShape.AddRange(pixel1,pixel2, pixel3,pixel4);
+        wallKickLookup = findWallKickLookupForIShape();
     }
     
     private void OShape()
@@ -158,6 +158,7 @@ public class Shape
         var pixel3 = new Pixel(centerX, centerY);
         var pixel4 = new Pixel(centerX + 1, centerY);
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
     private void SShape()
@@ -167,6 +168,7 @@ public class Shape
         var pixel3 = new Pixel(centerX, centerY-1);
         var pixel4 = new Pixel(centerX + 1, centerY-1);
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
     
     private void ZShape()
@@ -176,6 +178,7 @@ public class Shape
         var pixel3 = new Pixel(centerX, centerY);
         var pixel4 = new Pixel(centerX+1, centerY);
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
     
     
@@ -185,8 +188,8 @@ public class Shape
         var pixel2 = new Pixel(centerX - 1, centerY);
         var pixel3 = new Pixel(centerX, centerY);
         var pixel4 = new Pixel(centerX + 1, centerY);
-        
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
     private void JShape()
@@ -196,9 +199,47 @@ public class Shape
         var pixel3 = new Pixel(centerX, centerY);
         var pixel4 = new Pixel(centerX+1, centerY);
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
+
+    private Dictionary<WallKickData, Orientation> findWallKickLookupForIShape()
+    {
+        var data = new List<WallKickData>
+        {
+            new (Orientation.zero,  Orientation.right, [(0,0),(-2,0),(1,0),(-2,-1),(1,2)]),
+            new (Orientation.right, Orientation.zero,  [(0,0),(2,0),(-1,0),(2,1),(-1,-2)]),
+            new (Orientation.right, Orientation.two,   [(0,0),(-1,0),(2,0),(-1,2),(2,-1)]),
+            new (Orientation.two,   Orientation.right, [(0,0),(1,0),(-2,0),(1,-2),(-2,1)]),
+            new (Orientation.two,   Orientation.left,  [(0,0),(2,0),(-1,0),(2,1),(-1,-2)]),
+            new (Orientation.left,  Orientation.two,   [(0,0),(-2,0),(1,0),(-2,-1),(1,2)]),
+            new (Orientation.left,  Orientation.zero,  [(0,0),(1,0),(-2,0),(1,-2),(-2,1)]),
+            new (Orientation.zero,  Orientation.left,  [(0,0),(-1,0),(2,0),(-1,2),(2,-1)]),
+        };
+        return data.ToDictionary(x => x, x => x.nextOrientation);
+    }
+
+    private Dictionary<WallKickData, Orientation> findWallKickLookupForJLSTZShapes()
+    {
+        var data = new List<WallKickData>
+        {
+            new (Orientation.zero,  Orientation.right, [(0,0),(-1,0),(-1,1),(0,-2),(-1,-2)]),
+            new (Orientation.right, Orientation.zero,  [(0,0),(1,0),(1,-1),(0,2),(1,2)]),
+            new (Orientation.right, Orientation.two,   [(0,0),(1,0),(1,-1),(0,2),(1,2)]),
+            new (Orientation.two,   Orientation.right, [(0,0),(-1,0),(-1,1),(0,-2),(-1,-2)]),
+            new (Orientation.two,   Orientation.left,  [(0,0),(1,0),(1,1),(0,-2),(1,-2)]),
+            new (Orientation.left,  Orientation.two,   [(0,0),(-1,0),(-1,-1),(0,2),(-1,2)]),
+            new (Orientation.left,  Orientation.zero,  [(0,0),(-1,0),(-1,-1),(0,2),(-1,2)]),
+            new (Orientation.zero,  Orientation.left,  [(0,0),(1,0),(1,1),(0,-2),(1,-2)]),
+        };
+        return data.ToDictionary(x => x, x => x.nextOrientation);
+    }
+
 }
 
 public enum Orientation{
 zero, left, two, right
 }
+
+
+
+

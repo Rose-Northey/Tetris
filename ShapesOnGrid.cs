@@ -138,8 +138,23 @@ public class ShapesOnGrid
     
     public void rotateFallingShape(Direction direction)
     {
-        if (isRotationMovementIllegal(direction)) return;
-        fallingShape.rotateShape(direction);
+        //
+        if (isRotationMovementIllegal(direction))
+        {
+            fallingShape.rotateShape(direction);
+        }
+        //loop through all the kicks
+        //first find each pixels rotated coordinate, then try to see if the translation is possible
+        if (fallingShape.wallKickLookup != null)
+        {
+            foreach (var pixel in fallingShape.PixelsInShape)
+            {
+                fallingShape.findRotatedCoordinates(direction,pixel)
+            }
+        }
+        //TODO: is what I'm writing very similar to stuff I already have?
+        //TODO: first check whether you can rotate without kicks, then check whether you can kick, then if nothing works, do nothing
+       
     }
 
     private void setFallingShape()

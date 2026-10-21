@@ -10,9 +10,4 @@ public class Pixel(int x, int y)
 
     public Color color = Color.Blue;
 
-    public float hue;
-    public float saturation;
-    public float value;
-
-
 }
