@@ -9,8 +9,8 @@ public class Shape
     public int centerY;
     private float xOffset;
     private float yOffset;
-    private Orientation currentOrientation;
-    public readonly Dictionary<WallKickData, Orientation> wallKickLookup;
+    public Orientation currentOrientation;
+    public Dictionary<(Orientation initial, Orientation next), WallKickData> wallKickLookup;
 
     public Shape(int x, int y)
     {
@@ -89,7 +89,7 @@ public class Shape
         
     }
 
-    private Orientation FindNewOrientation(Direction direction)
+    public Orientation FindNewOrientation(Direction direction)
     {
         Orientation newOrientation;
         if (direction == Direction.Clockwise)
@@ -202,36 +202,37 @@ public class Shape
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
-    private Dictionary<WallKickData, Orientation> findWallKickLookupForIShape()
+    private Dictionary<(Orientation initial, Orientation next), WallKickData> findWallKickLookupForIShape()
     {
         var data = new List<WallKickData>
         {
-            new (Orientation.zero,  Orientation.right, [(0,0),(-2,0),(1,0),(-2,-1),(1,2)]),
-            new (Orientation.right, Orientation.zero,  [(0,0),(2,0),(-1,0),(2,1),(-1,-2)]),
-            new (Orientation.right, Orientation.two,   [(0,0),(-1,0),(2,0),(-1,2),(2,-1)]),
-            new (Orientation.two,   Orientation.right, [(0,0),(1,0),(-2,0),(1,-2),(-2,1)]),
-            new (Orientation.two,   Orientation.left,  [(0,0),(2,0),(-1,0),(2,1),(-1,-2)]),
-            new (Orientation.left,  Orientation.two,   [(0,0),(-2,0),(1,0),(-2,-1),(1,2)]),
-            new (Orientation.left,  Orientation.zero,  [(0,0),(1,0),(-2,0),(1,-2),(-2,1)]),
-            new (Orientation.zero,  Orientation.left,  [(0,0),(-1,0),(2,0),(-1,2),(2,-1)]),
+            new (initialOrientation: Orientation.zero,  Orientation.right, [(0,0),(-2,0),(1,0),(-2,-1),(1,2)]),
+            new (initialOrientation: Orientation.right, Orientation.zero,  [(0,0),(2,0),(-1,0),(2,1),(-1,-2)]),
+            new (initialOrientation: Orientation.right, Orientation.two,   [(0,0),(-1,0),(2,0),(-1,2),(2,-1)]),
+            new (initialOrientation: Orientation.two,   Orientation.right, [(0,0),(1,0),(-2,0),(1,-2),(-2,1)]),
+            new (initialOrientation: Orientation.two,   Orientation.left,  [(0,0),(2,0),(-1,0),(2,1),(-1,-2)]),
+            new (initialOrientation: Orientation.left,  Orientation.two,   [(0,0),(-2,0),(1,0),(-2,-1),(1,2)]),
+            new (initialOrientation: Orientation.left,  Orientation.zero,  [(0,0),(1,0),(-2,0),(1,-2),(-2,1)]),
+            new (initialOrientation: Orientation.zero,  Orientation.left,  [(0,0),(-1,0),(2,0),(-1,2),(2,-1)]),
         };
-        return data.ToDictionary(x => x, x => x.nextOrientation);
+        return data.ToDictionary(x => (initial: x.initialOrientation, next: x.nextOrientation),x => x);
     }
+    
 
-    private Dictionary<WallKickData, Orientation> findWallKickLookupForJLSTZShapes()
+    private Dictionary <(Orientation initial, Orientation next), WallKickData> findWallKickLookupForJLSTZShapes()
     {
         var data = new List<WallKickData>
         {
-            new (Orientation.zero,  Orientation.right, [(0,0),(-1,0),(-1,1),(0,-2),(-1,-2)]),
-            new (Orientation.right, Orientation.zero,  [(0,0),(1,0),(1,-1),(0,2),(1,2)]),
-            new (Orientation.right, Orientation.two,   [(0,0),(1,0),(1,-1),(0,2),(1,2)]),
-            new (Orientation.two,   Orientation.right, [(0,0),(-1,0),(-1,1),(0,-2),(-1,-2)]),
-            new (Orientation.two,   Orientation.left,  [(0,0),(1,0),(1,1),(0,-2),(1,-2)]),
-            new (Orientation.left,  Orientation.two,   [(0,0),(-1,0),(-1,-1),(0,2),(-1,2)]),
-            new (Orientation.left,  Orientation.zero,  [(0,0),(-1,0),(-1,-1),(0,2),(-1,2)]),
-            new (Orientation.zero,  Orientation.left,  [(0,0),(1,0),(1,1),(0,-2),(1,-2)]),
+            new (initialOrientation: Orientation.zero,  Orientation.right, [(0,0),(-1,0),(-1,1),(0,-2),(-1,-2)]),
+            new (initialOrientation: Orientation.right, Orientation.zero,  [(0,0),(1,0),(1,-1),(0,2),(1,2)]),
+            new (initialOrientation: Orientation.right, Orientation.two,   [(0,0),(1,0),(1,-1),(0,2),(1,2)]),
+            new (initialOrientation: Orientation.two,   Orientation.right, [(0,0),(-1,0),(-1,1),(0,-2),(-1,-2)]),
+            new (initialOrientation: Orientation.two,   Orientation.left,  [(0,0),(1,0),(1,1),(0,-2),(1,-2)]),
+            new (initialOrientation: Orientation.left,  Orientation.two,   [(0,0),(-1,0),(-1,-1),(0,2),(-1,2)]),
+            new (initialOrientation: Orientation.left,  Orientation.zero,  [(0,0),(-1,0),(-1,-1),(0,2),(-1,2)]),
+            new (initialOrientation: Orientation.zero,  Orientation.left,  [(0,0),(1,0),(1,1),(0,-2),(1,-2)]),
         };
-        return data.ToDictionary(x => x, x => x.nextOrientation);
+        return data.ToDictionary(x => (initial: x.initialOrientation, next: x.nextOrientation),x => x);
     }
 
 }

@@ -145,11 +145,15 @@ public class ShapesOnGrid
         }
         //loop through all the kicks
         //first find each pixels rotated coordinate, then try to see if the translation is possible
+        var currentOrientation = fallingShape.currentOrientation;
+        var newOrientation = fallingShape.FindNewOrientation(direction);
         if (fallingShape.wallKickLookup != null)
         {
+            var releventWallKicks = fallingShape.wallKickLookup[(initial:currentOrientation, next: newOrientation)];
             foreach (var pixel in fallingShape.PixelsInShape)
             {
-                fallingShape.findRotatedCoordinates(direction,pixel)
+                var (aspiringX, aspiringY) = fallingShape.findRotatedCoordinates(direction, pixel);
+                isMovementAllowed(fallingShape.wallKickLookup.)
             }
         }
         //TODO: is what I'm writing very similar to stuff I already have?
