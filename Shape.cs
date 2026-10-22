@@ -10,8 +10,8 @@ public class Shape
     private float xOffset;
     private float yOffset;
     public Orientation currentOrientation;
-    public Dictionary<(Orientation initial, Orientation next), WallKickData> wallKickLookup;
-
+    public Dictionary<(Orientation initial, Orientation next), List<(int x, int y)>> wallKickLookup;
+    
     public Shape(int x, int y)
     {
         centerX = x;
@@ -202,7 +202,7 @@ public class Shape
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
-    private Dictionary<(Orientation initial, Orientation next), WallKickData> findWallKickLookupForIShape()
+    private Dictionary<(Orientation initial, Orientation next), List<(int x,int y)>> findWallKickLookupForIShape()
     {
         var data = new List<WallKickData>
         {
@@ -215,11 +215,11 @@ public class Shape
             new (initialOrientation: Orientation.left,  Orientation.zero,  [(0,0),(1,0),(-2,0),(1,-2),(-2,1)]),
             new (initialOrientation: Orientation.zero,  Orientation.left,  [(0,0),(-1,0),(2,0),(-1,2),(2,-1)]),
         };
-        return data.ToDictionary(x => (initial: x.initialOrientation, next: x.nextOrientation),x => x);
+        return data.ToDictionary(x => (initial: x.initialOrientation, next: x.nextOrientation),x => x.wallKickCoordinates);
     }
     
 
-    private Dictionary <(Orientation initial, Orientation next), WallKickData> findWallKickLookupForJLSTZShapes()
+    private Dictionary <(Orientation initial, Orientation next), List<(int x,int y)>> findWallKickLookupForJLSTZShapes()
     {
         var data = new List<WallKickData>
         {
@@ -232,7 +232,7 @@ public class Shape
             new (initialOrientation: Orientation.left,  Orientation.zero,  [(0,0),(-1,0),(-1,-1),(0,2),(-1,2)]),
             new (initialOrientation: Orientation.zero,  Orientation.left,  [(0,0),(1,0),(1,1),(0,-2),(1,-2)]),
         };
-        return data.ToDictionary(x => (initial: x.initialOrientation, next: x.nextOrientation),x => x);
+        return data.ToDictionary(x => (initial: x.initialOrientation, next: x.nextOrientation),x => x.wallKickCoordinates);
     }
 
 }

@@ -122,7 +122,7 @@ public class ShapesOnGrid
 
     private void enactGravity()
     {
-        if (isMovementAllowed(0, 1))
+        if (isShapeMovementAllowed(0, 1))
         {
             fallingShape.moveShape(0, 1);
             return;
@@ -132,7 +132,7 @@ public class ShapesOnGrid
     
     public void moveFallingShape(int x, int y)
     {
-        if(!isMovementAllowed(x, y)) return;
+        if(!isShapeMovementAllowed(x, y)) return;
         fallingShape.moveShape(x, y);
     }
     
@@ -149,12 +149,20 @@ public class ShapesOnGrid
         var newOrientation = fallingShape.FindNewOrientation(direction);
         if (fallingShape.wallKickLookup != null)
         {
-            var releventWallKicks = fallingShape.wallKickLookup[(initial:currentOrientation, next: newOrientation)];
-            foreach (var pixel in fallingShape.PixelsInShape)
+            var wallKickCoordinates = fallingShape.wallKickLookup[(initial:currentOrientation, next: newOrientation)];
+            foreach (var coordinate in wallKickCoordinates)
             {
-                var (aspiringX, aspiringY) = fallingShape.findRotatedCoordinates(direction, pixel);
-                isMovementAllowed(fallingShape.wallKickLookup.)
+                foreach (var pixel in fallingShape.PixelsInShape)
+                {
+                    var (movementX, movementY) = coordinate;
+                    var (theoreticalX, theoreticalY) = fallingShape.findRotatedCoordinates(direction, pixel);
+                    isPixelMovementAllowed(movementX, movementY, theoreticalX, theoreticalY);
+                    //if pixel movement is not allowed, abandon this wall kick possibility
+                    //if, its allowed, then figure out if all pixels have been tested and if so, then do it for real
+                }
+                //if pixel movement was allowed for all pixels, then this is the wall kick for you! Make it real
             }
+           
         }
         //TODO: is what I'm writing very similar to stuff I already have?
         //TODO: first check whether you can rotate without kicks, then check whether you can kick, then if nothing works, do nothing
@@ -183,19 +191,27 @@ public class ShapesOnGrid
         return false;
     }
 
-    bool isMovementAllowed(int x, int y)
+    bool isShapeMovementAllowed(int x, int y)
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
-            var aspiringX = pixel.X + x;
-            var aspiringY = pixel.Y + y;
-
-            if (aspiringX is < 0 or > nXPixelsInGrid - 1) return false;
-            if (aspiringY > nYPixelsInGrid - 1) return false;
-            if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return false;
+            if (!isPixelMovementAllowed(x, y, pixel.X, pixel.Y)) return false;
         }
         return true;
     }
+
+    bool isPixelMovementAllowed(int xMovement, int yMovement, int xCurrent, int yCurrent )
+    {
+        var aspiringX = xCurrent+ xMovement;
+        var aspiringY = yCurrent + yMovement;
+
+        if (aspiringX is < 0 or > nXPixelsInGrid - 1) return false;
+        if (aspiringY > nYPixelsInGrid - 1) return false;
+        if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return false;
+        return true;
+    }
+    
+    
 
     bool isRotationMovementIllegal(Direction direction)
     {
