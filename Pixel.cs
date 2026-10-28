@@ -5,9 +5,7 @@ namespace Tetris;
 public class Pixel(int x, int y)
 {
     public const int Width = 30;
-    public int X { get; set; } = x;
-    public int Y { get; set; } = y;
-
+    public Coordinate coordinate = new (x, y);
     public Color color = Color.Blue;
 
 }

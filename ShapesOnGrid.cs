@@ -60,14 +60,14 @@ public class ShapesOnGrid
         DrawGrid();
         foreach (var pixel in fallingShape.PixelsInShape)
         { 
-            if (pixel.Y<0) continue;
-            var (pixelX, pixelY) = gridToWindowCoordinates(pixel.X, pixel.Y); 
+            if (pixel.coordinate.y<0) continue;
+            var (pixelX, pixelY) = gridToWindowCoordinates(pixel.coordinate.x, pixel.coordinate.y); 
             Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, pixel.color);
         }
         
         foreach (var pixel in settledPixels)
         {
-            var (gridObjX, gridObjY) = gridToWindowCoordinates(pixel.X, pixel.Y);
+            var (gridObjX, gridObjY) = gridToWindowCoordinates(pixel.coordinate.x, pixel.coordinate.y);
             Raylib.DrawRectangle(gridObjX, gridObjY, Pixel.Width, Pixel.Width, pixel.color);
         }
 
@@ -82,8 +82,8 @@ public class ShapesOnGrid
         {
             foreach (var pixel in shape.PixelsInShape)
             {
-                var diffX = pixel.X - shape.centerX;
-                var diffY = pixel.Y - shape.centerY;
+                var diffX = pixel.coordinate.x - shape.centerX;
+                var diffY = pixel.coordinate.y - shape.centerY;
                 
                 var gridObjX = centerX + diffX*6;
                 var gridObjY = centerY + diffY*6;
@@ -138,35 +138,36 @@ public class ShapesOnGrid
     
     public void rotateFallingShape(Direction direction)
     {
-        //
         if (isRotationMovementIllegal(direction))
         {
             fallingShape.rotateShape(direction);
         }
-        //loop through all the kicks
-        //first find each pixels rotated coordinate, then try to see if the translation is possible
         var currentOrientation = fallingShape.currentOrientation;
         var newOrientation = fallingShape.FindNewOrientation(direction);
-        if (fallingShape.wallKickLookup != null)
+        if (fallingShape.wallKickLookup == null) return;
+        var wallKickCoordinates = fallingShape.wallKickLookup[(initial:currentOrientation, next: newOrientation)];
+        foreach (var coordinate in wallKickCoordinates)
         {
-            var wallKickCoordinates = fallingShape.wallKickLookup[(initial:currentOrientation, next: newOrientation)];
-            foreach (var coordinate in wallKickCoordinates)
-            {
-                foreach (var pixel in fallingShape.PixelsInShape)
-                {
-                    var (movementX, movementY) = coordinate;
-                    var (theoreticalX, theoreticalY) = fallingShape.findRotatedCoordinates(direction, pixel);
-                    isPixelMovementAllowed(movementX, movementY, theoreticalX, theoreticalY);
-                    //if pixel movement is not allowed, abandon this wall kick possibility
-                    //if, its allowed, then figure out if all pixels have been tested and if so, then do it for real
-                }
-                //if pixel movement was allowed for all pixels, then this is the wall kick for you! Make it real
-            }
-           
+            if (!coordinateIsViable(coordinate, direction)) continue;
+            fallingShape.rotateShape(direction);
+            fallingShape.moveShape(coordinate.x, coordinate.y);
         }
-        //TODO: is what I'm writing very similar to stuff I already have?
-        //TODO: first check whether you can rotate without kicks, then check whether you can kick, then if nothing works, do nothing
-       
+    }
+    //TODO: Is it possible that is coordinate viable method replaces some methods?? supply both movement and rotation
+
+    private bool coordinateIsViable((int x, int y) coordinate,Direction direction )
+    {
+        foreach (var pixel in fallingShape.PixelsInShape)
+        {
+            var (movementX, movementY) = coordinate;
+            var (theoreticalX, theoreticalY) = fallingShape.findRotatedCoordinates(direction, pixel);
+            if (!isPixelMovementAllowed(movementX, movementY, theoreticalX, theoreticalY))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void setFallingShape()
@@ -186,7 +187,7 @@ public class ShapesOnGrid
     {
         foreach (var pixel in settledPixels)
         {
-            if (pixel.Y < 0) return true;
+            if (pixel.coordinate.y < 0) return true;
         }
         return false;
     }
@@ -195,7 +196,7 @@ public class ShapesOnGrid
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
-            if (!isPixelMovementAllowed(x, y, pixel.X, pixel.Y)) return false;
+            if (!isPixelMovementAllowed(x, y, pixel.coordinate.x, pixel.coordinate.y)) return false;
         }
         return true;
     }
@@ -207,7 +208,7 @@ public class ShapesOnGrid
 
         if (aspiringX is < 0 or > nXPixelsInGrid - 1) return false;
         if (aspiringY > nYPixelsInGrid - 1) return false;
-        if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return false;
+        if (settledPixels.Any((pixel) => pixel.coordinate.x == aspiringX && pixel.coordinate.y == aspiringY)) return false;
         return true;
     }
     
@@ -220,7 +221,7 @@ public class ShapesOnGrid
             var (aspiringX, aspiringY) = fallingShape.findRotatedCoordinates(direction, pixel);
             if (aspiringX is < 0 or > nXPixelsInGrid - 1) return true;
             if (aspiringY > nYPixelsInGrid - 1) return true;
-            if (settledPixels.Any((obj) => obj.X == aspiringX && obj.Y == aspiringY)) return true;
+            if (settledPixels.Any((pixel) => pixel.coordinate.x == aspiringX && pixel.coordinate.y == aspiringY)) return true;
         }
         return false;
     }
@@ -229,7 +230,7 @@ public class ShapesOnGrid
     {
         for (var rowNumber = 0; rowNumber < nYPixelsInGrid; rowNumber++)
         {
-            var pixelsInRow = settledPixels.Where((shape) => shape.Y == rowNumber);
+            var pixelsInRow = settledPixels.Where((pixel) => pixel.coordinate.y == rowNumber);
             if (isRowFull(pixelsInRow)) continue;
             onRowClear();
             settledPixels.RemoveAll((pixel)=>pixelsInRow.Contains(pixel));
@@ -246,9 +247,9 @@ public class ShapesOnGrid
     {
         foreach (var settledPixel in settledPixels)
         {
-            if (settledPixel.Y < removedRowNumber)
+            if (settledPixel.coordinate.y < removedRowNumber)
             {
-                settledPixel.Y++;
+                settledPixel.coordinate = settledPixel.coordinate with { y = settledPixel.coordinate.y+1 };
             }
         }
     }

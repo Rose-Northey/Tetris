@@ -69,8 +69,7 @@ public class Shape
         centerY += y;
         foreach (var pixel in PixelsInShape)
         {
-            pixel.X += x;
-            pixel.Y += y;
+            pixel.coordinate = new Coordinate(pixel.coordinate.x + x, pixel.coordinate.y + y);
         }
     }
 
@@ -83,8 +82,7 @@ public class Shape
         foreach (var pixel in PixelsInShape)
         {
             var (aspiringX, aspiringY) = findRotatedCoordinates(direction, pixel);
-            pixel.X = aspiringX;
-            pixel.Y = aspiringY;
+            pixel.coordinate = new Coordinate(aspiringX, aspiringY);
         }
         
     }
@@ -113,18 +111,18 @@ public class Shape
         return newOrientation;
     }
     
-    public (int, int) findRotatedCoordinates(Direction direction, Pixel pixel)
+    public Coordinate findRotatedCoordinates(Direction direction, Pixel pixel)
     {
         var calculatedCenterX = centerX + xOffset;
         var calculatedCenterY = centerY + yOffset;
-        var xDiff = pixel.X - calculatedCenterX;
-        var yDiff = pixel.Y - calculatedCenterY;
+        var xDiff = pixel.coordinate.x - calculatedCenterX;
+        var yDiff = pixel.coordinate.y - calculatedCenterY;
         var aspiringXRaw = calculatedCenterX - yDiff * (int)direction;
         var aspiringYRaw = calculatedCenterY + xDiff * (int)direction;
         var aspiringX = (int)Math.Round(aspiringXRaw); ;
         var aspiringY = (int)Math.Round(aspiringYRaw);
-    
-        return (aspiringX, aspiringY);
+
+        return new Coordinate(aspiringX, aspiringY);
     }
         
     private void IShape()
