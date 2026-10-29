@@ -160,8 +160,8 @@ public class ShapesOnGrid
         foreach (var pixel in fallingShape.PixelsInShape)
         {
             var (movementX, movementY) = coordinate;
-            var (theoreticalX, theoreticalY) = fallingShape.findRotatedCoordinates(direction, pixel);
-            if (!isPixelMovementAllowed(movementX, movementY, theoreticalX, theoreticalY))
+            var rotatedCoordinate= fallingShape.findRotatedCoordinates(direction, pixel);
+            if (!isPixelMovementAllowed(movementX, movementY, rotatedCoordinate))
             {
                 return false;
             }
@@ -196,15 +196,15 @@ public class ShapesOnGrid
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
-            if (!isPixelMovementAllowed(x, y, pixel.coordinate.x, pixel.coordinate.y)) return false;
+            if (!isPixelMovementAllowed(x, y, pixel.coordinate)) return false;
         }
         return true;
     }
 
-    bool isPixelMovementAllowed(int xMovement, int yMovement, int xCurrent, int yCurrent )
+    bool isPixelMovementAllowed(int xMovement, int yMovement, Coordinate pixelLocation)
     {
-        var aspiringX = xCurrent+ xMovement;
-        var aspiringY = yCurrent + yMovement;
+        var aspiringX = pixelLocation.x+ xMovement;
+        var aspiringY = pixelLocation.y + yMovement;
 
         if (aspiringX is < 0 or > nXPixelsInGrid - 1) return false;
         if (aspiringY > nYPixelsInGrid - 1) return false;
