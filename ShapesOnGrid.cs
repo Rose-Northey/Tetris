@@ -53,7 +53,12 @@ public class ShapesOnGrid
     {
         enactGravity();
     }
-    
+
+    private void DrawPixel(Pixel pixel)
+    {
+        var absolutePosition = gridToWindowCoordinates(pixel.coordinate); 
+        Raylib.DrawRectangle(absolutePosition.x, absolutePosition.y, Pixel.Width, Pixel.Width, pixel.color);
+    }
     
     public void DrawFrame()
     {
@@ -61,20 +66,19 @@ public class ShapesOnGrid
         foreach (var pixel in fallingShape.PixelsInShape)
         { 
             if (pixel.coordinate.y<0) continue;
-            var (pixelX, pixelY) = gridToWindowCoordinates(pixel.coordinate.x, pixel.coordinate.y); 
-            Raylib.DrawRectangle(pixelX, pixelY, Pixel.Width, Pixel.Width, pixel.color);
+            DrawPixel(pixel);
         }
         
         foreach (var pixel in settledPixels)
         {
-            var (gridObjX, gridObjY) = gridToWindowCoordinates(pixel.coordinate.x, pixel.coordinate.y);
-            Raylib.DrawRectangle(gridObjX, gridObjY, Pixel.Width, Pixel.Width, pixel.color);
+           DrawPixel(pixel);
         }
 
   
         const int rightHandEdgeOfGameGrid = nXPixelsInGrid;
         const int topOfGameGrid = 1;
-        var(rightHandEdgeOfGameGridCanvas,topOfGameGridCanvas) = gridToWindowCoordinates(rightHandEdgeOfGameGrid, topOfGameGrid);
+        var rightCorner = new Coordinate(rightHandEdgeOfGameGrid, topOfGameGrid);
+        var(rightHandEdgeOfGameGridCanvas,topOfGameGridCanvas) = gridToWindowCoordinates(rightCorner);
         var centerX = rightHandEdgeOfGameGridCanvas + 10;
         var centerY = topOfGameGridCanvas - 15;
                     
@@ -94,11 +98,11 @@ public class ShapesOnGrid
         }
     }
 
-    private (int, int) gridToWindowCoordinates(int gridX, int gridY)
+    private Coordinate gridToWindowCoordinates(Coordinate gridLocation)
     {
-        var windowX = gridX * gridSquareSize + xOrigin;
-        var windowY = gridY * gridSquareSize + yOrigin;
-        return (windowX, windowY);
+        var windowX = gridLocation.x * gridSquareSize + xOrigin;
+        var windowY = gridLocation.y * gridSquareSize + yOrigin;
+        return new Coordinate(windowX, windowY);
     }
 
 
