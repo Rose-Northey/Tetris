@@ -209,7 +209,7 @@ public class ShapesOnGrid
     {
         var aspiringLocation = new Coordinate(pixelLocation.x + xMovement, pixelLocation.y + yMovement);
         if (isLocatedOutsideGrid(aspiringLocation)) return false;
-        return isPixelFree(aspiringLocation);
+        return isLocationEmpty(aspiringLocation);
     }
 
 
@@ -217,10 +217,9 @@ public class ShapesOnGrid
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
-            var (aspiringX, aspiringY) = fallingShape.findRotatedCoordinates(direction, pixel);
-            if (aspiringX is < 0 or > nXPixelsInGrid - 1) return true;
-            if (aspiringY > nYPixelsInGrid - 1) return true;
-            if (settledPixels.Any((pixel) => pixel.coordinate.x == aspiringX && pixel.coordinate.y == aspiringY)) return true;
+            var aspiringLocation = fallingShape.findRotatedCoordinates(direction, pixel);
+            if (isLocatedOutsideGrid(aspiringLocation)) return false;
+            return isLocationEmpty(aspiringLocation);
         }
         return false;
     }
@@ -243,7 +242,7 @@ public class ShapesOnGrid
         return location.y > nYPixelsInGrid - 1;
     }
 
-    private bool isPixelFree(Coordinate location)
+    private bool isLocationEmpty(Coordinate location)
     {
         return !settledPixels.Any((pixel) => pixel.coordinate.x == location.x && pixel.coordinate.y == location.y);
     }
