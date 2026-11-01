@@ -5,17 +5,15 @@ namespace Tetris;
 public class Shape
 {
     public readonly List<Pixel> PixelsInShape = [];
-    public int centerX;//grid coordinates
-    public int centerY;
+    public Coordinate center;
     private float xOffset;
     private float yOffset;
-    public Orientation currentOrientation;
+    public readonly Orientation currentOrientation;
     public Dictionary<(Orientation initial, Orientation next), List<(int x, int y)>> wallKickLookup;
     
     public Shape(int x, int y)
     {
-        centerX = x;
-        centerY = y;
+        center = new Coordinate(x, y);
         xOffset = 0;
         yOffset = 0;
         var buildShape = GenerateShapeRecipe();
@@ -65,8 +63,7 @@ public class Shape
 
     public void moveShape(int x, int y)
     {
-        centerX += x;
-        centerY += y;
+        center = new Coordinate(center.x+x, center.y+y);
         foreach (var pixel in PixelsInShape)
         {
             pixel.coordinate = new Coordinate(pixel.coordinate.x + x, pixel.coordinate.y + y);
@@ -113,8 +110,8 @@ public class Shape
     
     public Coordinate findRotatedCoordinates(Direction direction, Pixel pixel)
     {
-        var calculatedCenterX = centerX + xOffset;
-        var calculatedCenterY = centerY + yOffset;
+        var calculatedCenterX = center.x + xOffset;
+        var calculatedCenterY = center.y + yOffset;
         var xDiff = pixel.coordinate.x - calculatedCenterX;
         var yDiff = pixel.coordinate.y - calculatedCenterY;
         var aspiringXRaw = calculatedCenterX - yDiff * (int)direction;
@@ -127,11 +124,11 @@ public class Shape
         
     private void IShape()
     {
-        centerY -= 1;
-        var pixel1 = new Pixel(centerX, centerY - 1);
-        var pixel2 = new Pixel(centerX, centerY-2);
-        var pixel3 = new Pixel(centerX, centerY);
-        var pixel4 = new Pixel(centerX, centerY+1);   
+        center = center with { y = center.y - 1 };
+        var pixel1 = new Pixel(center with {y=center.y-1});
+        var pixel2 = new Pixel(center with {y=center.y-2});
+        var pixel3 = new Pixel(center);
+        var pixel4 = new Pixel(center with { y = center.y + 1 });
         xOffset = -0.5F;
         yOffset = -0.5F;
         PixelsInShape.AddRange(pixel1,pixel2, pixel3,pixel4);
@@ -140,10 +137,11 @@ public class Shape
     
     private void OShape()
     {
-        var pixel1 = new Pixel(centerX - 1, centerY - 1);
-        var pixel2 = new Pixel(centerX, centerY - 1);
-        var pixel3 = new Pixel(centerX - 1, centerY);
-        var pixel4 = new Pixel(centerX, centerY);
+        var pixel1 = new Pixel(new Coordinate(center.x - 1, center.y - 1));
+        var pixel2 = new Pixel(center with { y = center.y - 1 });
+        var pixel3 = new Pixel(center with { x = center.x - 1 });
+        var pixel4 = new Pixel(center);
+        
         xOffset = -0.5F;
         yOffset = -0.5F;
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
@@ -151,30 +149,33 @@ public class Shape
 
     private void TShape()
     {
-        var pixel1 = new Pixel(centerX, centerY - 1);
-        var pixel2 = new Pixel(centerX - 1, centerY);
-        var pixel3 = new Pixel(centerX, centerY);
-        var pixel4 = new Pixel(centerX + 1, centerY);
+        var pixel1 = new Pixel(center with { y = center.y - 1 });
+        var pixel2 = new Pixel(center with { x = center.x - 1 });
+        var pixel3 = new Pixel(center);
+        var pixel4 = new Pixel(center with { x = center.x + 1 });
+
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
     private void SShape()
     {
-        var pixel1 = new Pixel(centerX-1, centerY);
-        var pixel2 = new Pixel(centerX, centerY);
-        var pixel3 = new Pixel(centerX, centerY-1);
-        var pixel4 = new Pixel(centerX + 1, centerY-1);
+        var pixel1 = new Pixel(center with { x = center.x - 1 });
+        var pixel2 = new Pixel(center);
+        var pixel3 = new Pixel(center with { y = center.y - 1 });
+        var pixel4 = new Pixel(new Coordinate(center.x+1, center.y-1));
+
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
     
     private void ZShape()
     {
-        var pixel1 = new Pixel(centerX-1, centerY-1);
-        var pixel2 = new Pixel(centerX, centerY-1);
-        var pixel3 = new Pixel(centerX, centerY);
-        var pixel4 = new Pixel(centerX+1, centerY);
+        var pixel1 = new Pixel(new Coordinate(center.x - 1, center.y - 1));
+        var pixel2 = new Pixel(center with { y = center.y - 1 });
+        var pixel3 = new Pixel(center);
+        var pixel4 = new Pixel(center with { x = center.x + 1 });
+        
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
@@ -182,20 +183,22 @@ public class Shape
     
     private void LShape()
     {
-        var pixel1 = new Pixel(centerX + 1, centerY - 1);
-        var pixel2 = new Pixel(centerX - 1, centerY);
-        var pixel3 = new Pixel(centerX, centerY);
-        var pixel4 = new Pixel(centerX + 1, centerY);
+        var pixel1 = new Pixel(new Coordinate(center.x + 1, center.y - 1));
+        var pixel2 = new Pixel(center with { x = center.x - 1 });
+        var pixel3 = new Pixel(center);
+        var pixel4 = new Pixel(center with { x = center.x + 1 });
+
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
     private void JShape()
     {
-        var pixel1 = new Pixel(centerX-1, centerY-1);
-        var pixel2 = new Pixel(centerX-1, centerY);
-        var pixel3 = new Pixel(centerX, centerY);
-        var pixel4 = new Pixel(centerX+1, centerY);
+        var pixel1 = new Pixel(new Coordinate(center.x - 1, center.y - 1));
+        var pixel2 = new Pixel(center with { x = center.x - 1 });
+        var pixel3 = new Pixel(center);
+        var pixel4 = new Pixel(center with { x = center.x + 1 });
+        
         PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }

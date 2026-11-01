@@ -6,13 +6,13 @@ public class ShapesOnGrid
 {
     private int nWidth;
     private int nHeight;
-    private int xOrigin;
-    private int yOrigin;
+    private readonly int xOrigin;
+    private readonly int yOrigin;
     private const int nXPixelsInGrid= 5;
     private const int nYPixelsInGrid= 10;
     private Shape fallingShape;
     private Queue<Shape> waitingShapes;
-    private int gridSquareSize;
+    private readonly int gridSquareSize;
     private List<Pixel> settledPixels;
     private static readonly Color colourOfGridFill = Color.FromHSV(222, 0.50f, 0.22f);
     private static readonly Color colourOfGridBorder = Color.FromHSV(188, 0.80f, 0.85f);
@@ -86,8 +86,8 @@ public class ShapesOnGrid
         {
             foreach (var pixel in shape.PixelsInShape)
             {
-                var diffX = pixel.coordinate.x - shape.centerX;
-                var diffY = pixel.coordinate.y - shape.centerY;
+                var diffX = pixel.coordinate.x - shape.center.x;
+                var diffY = pixel.coordinate.y - shape.center.y;
                 
                 var gridObjX = centerX + diffX*6;
                 var gridObjY = centerY + diffY*6;
