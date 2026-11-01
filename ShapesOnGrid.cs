@@ -207,12 +207,9 @@ public class ShapesOnGrid
 
     private bool isPixelMovementAllowed(int xMovement, int yMovement, Coordinate pixelLocation)
     {
-        var aspiringX = pixelLocation.x+ xMovement;
-        var aspiringY = pixelLocation.y + yMovement;
-
-        if (aspiringX is < 0 or > nXPixelsInGrid - 1) return false;
-        if (aspiringY > nYPixelsInGrid - 1) return false;
-        return !settledPixels.Any((pixel) => pixel.coordinate.x == aspiringX && pixel.coordinate.y == aspiringY);
+        var aspiringLocation = new Coordinate(pixelLocation.x + xMovement, pixelLocation.y + yMovement);
+        if (isLocatedOutsideGrid(aspiringLocation)) return false;
+        return isPixelFree(aspiringLocation);
     }
 
 
@@ -240,6 +237,17 @@ public class ShapesOnGrid
         }
     }
 
+    private bool isLocatedOutsideGrid(Coordinate location)
+    {
+        if (location.x is < 0 or > nXPixelsInGrid - 1) return true;
+        return location.y > nYPixelsInGrid - 1;
+    }
+
+    private bool isPixelFree(Coordinate location)
+    {
+        return !settledPixels.Any((pixel) => pixel.coordinate.x == location.x && pixel.coordinate.y == location.y);
+    }
+    
     private bool isRowFull(IEnumerable<Pixel> pixelsInRow)
     {
         return pixelsInRow.Count() != nXPixelsInGrid;
