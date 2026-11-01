@@ -67,11 +67,9 @@ internal static class Program
         gameState.Reset();
         
     }
-    public static void DrawScore(int score)
+
+    private static void DrawScore(int score)
     {
-        // var (leftOfGrid, bottomOfGrid) = gridToWindowCoordinates(0, nYPixelsInGrid);
-        //
-        // Raylib.DrawText($"Score: {singleFrameScore}", leftOfGrid, bottomOfGrid+15, 10, Color.White);
         Raylib.DrawText($"Score: {score}", 0, 0, 10, Color.White);
         
     }

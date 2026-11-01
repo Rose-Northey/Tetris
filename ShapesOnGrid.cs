@@ -53,7 +53,7 @@ public class ShapesOnGrid
     {
         enactGravity();
     }
-
+ 
     private void DrawPixel(Pixel pixel)
     {
         var absolutePosition = gridToWindowCoordinates(pixel.coordinate); 
@@ -196,7 +196,7 @@ public class ShapesOnGrid
         return false;
     }
 
-    bool isShapeMovementAllowed(int x, int y)
+    private bool isShapeMovementAllowed(int x, int y)
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
@@ -205,20 +205,18 @@ public class ShapesOnGrid
         return true;
     }
 
-    bool isPixelMovementAllowed(int xMovement, int yMovement, Coordinate pixelLocation)
+    private bool isPixelMovementAllowed(int xMovement, int yMovement, Coordinate pixelLocation)
     {
         var aspiringX = pixelLocation.x+ xMovement;
         var aspiringY = pixelLocation.y + yMovement;
 
         if (aspiringX is < 0 or > nXPixelsInGrid - 1) return false;
         if (aspiringY > nYPixelsInGrid - 1) return false;
-        if (settledPixels.Any((pixel) => pixel.coordinate.x == aspiringX && pixel.coordinate.y == aspiringY)) return false;
-        return true;
+        return !settledPixels.Any((pixel) => pixel.coordinate.x == aspiringX && pixel.coordinate.y == aspiringY);
     }
-    
-    
 
-    bool isRotationMovementIllegal(Direction direction)
+
+    private bool isRotationMovementIllegal(Direction direction)
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
@@ -230,7 +228,7 @@ public class ShapesOnGrid
         return false;
     }
 
-    void removeFullRows()
+    private void removeFullRows()
     {
         for (var rowNumber = 0; rowNumber < nYPixelsInGrid; rowNumber++)
         {
@@ -242,12 +240,12 @@ public class ShapesOnGrid
         }
     }
 
-    bool isRowFull(IEnumerable<Pixel> pixelsInRow)
+    private bool isRowFull(IEnumerable<Pixel> pixelsInRow)
     {
         return pixelsInRow.Count() != nXPixelsInGrid;
     }
 
-    void moveSettledPixelsDown(int removedRowNumber)
+    private void moveSettledPixelsDown(int removedRowNumber)
     {
         foreach (var settledPixel in settledPixels)
         {
