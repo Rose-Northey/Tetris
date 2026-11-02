@@ -124,7 +124,8 @@ public class ShapesOnGrid
 
     private void enactGravity()
     {
-        if (isShapeMovementAllowed(0, 1))
+        
+        if (isShapeMovementAllowed(fallingShape,Direction.None,0, 1))
         {
             fallingShape.moveShape(0, 1);
             return;
@@ -134,13 +135,13 @@ public class ShapesOnGrid
     
     public void moveFallingShape(int x, int y)
     {
-        if(!isShapeMovementAllowed(x, y)) return;
+        if(!isShapeMovementAllowed(fallingShape,Direction.None, x,y)) return;
         fallingShape.moveShape(x, y);
     }
     
     public void rotateFallingShape(Direction direction)
     {
-        if (!isRotationMovementIllegal(direction))
+        if (isShapeMovementAllowed(fallingShape, direction,0,0))
         {
             fallingShape.rotateShape(direction);
         }
@@ -191,39 +192,20 @@ public class ShapesOnGrid
         return false;
     }
 
-    private bool isShapeMovementAllowed(int x, int y)
-    {
-        foreach (var pixel in fallingShape.PixelsInShape)
-        {
-            if (!isPixelMovementAllowed(x, y, pixel.coordinate)) return false;
-        }
-        return true;
-    }
-
-    private bool isPixelMovementAllowed(int xMovement, int yMovement, Coordinate pixelLocation)
-    {
-        var aspiringLocation = new Coordinate(pixelLocation.x + xMovement, pixelLocation.y + yMovement);
-        return isLocationAllowed(aspiringLocation);
-    }
-
     private bool isLocationAllowed(Coordinate location)
     {
         return !isLocatedOutsideGrid(location) && isLocationEmpty(location);
     }
 
-
-    private bool isRotationMovementIllegal(Direction direction)
+    private bool isShapeMovementAllowed(Shape shape, Direction direction,int xMovement,int yMovement)
     {
-        foreach (var pixel in fallingShape.PixelsInShape)
+        foreach (var pixel in shape.PixelsInShape)
         {
-            var aspiringLocation = fallingShape.findRotatedTranslatedPixelLocation(pixel,0,0,direction);
-            if (!isLocationAllowed(aspiringLocation)) return true;
+            var aspiringLocation = shape.findRotatedTranslatedPixelLocation(pixel,xMovement,yMovement,direction);
+            if (!isLocationAllowed(aspiringLocation)) return false;
         }
-        return false;
+        return true;
     }
-
-  
-    
 
     private void removeFullRows()
     {
