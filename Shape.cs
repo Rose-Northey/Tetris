@@ -78,7 +78,7 @@ public class Shape
         //if the rotation won't work, try each wall kick translation otherwise, do nothing
         foreach (var pixel in PixelsInShape)
         {
-            var (aspiringX, aspiringY) = findRotatedCoordinates(direction, pixel);
+            var (aspiringX, aspiringY) = findPixelRotatedCoordinates(direction, pixel.coordinate);
             pixel.coordinate = new Coordinate(aspiringX, aspiringY);
         }
         
@@ -108,12 +108,14 @@ public class Shape
         return newOrientation;
     }
     
-    public Coordinate findRotatedCoordinates(Direction direction, Pixel pixel)
+    private Coordinate findPixelRotatedCoordinates(Direction direction, Coordinate coordinate)
     {
+        if (direction == Direction.None) return coordinate;
+        
         var calculatedCenterX = center.x + xOffset;
         var calculatedCenterY = center.y + yOffset;
-        var xDiff = pixel.coordinate.x - calculatedCenterX;
-        var yDiff = pixel.coordinate.y - calculatedCenterY;
+        var xDiff = coordinate.x - calculatedCenterX;
+        var yDiff = coordinate.y - calculatedCenterY;
         var aspiringXRaw = calculatedCenterX - yDiff * (int)direction;
         var aspiringYRaw = calculatedCenterY + xDiff * (int)direction;
         var aspiringX = (int)Math.Round(aspiringXRaw); ;
@@ -121,6 +123,21 @@ public class Shape
 
         return new Coordinate(aspiringX, aspiringY);
     }
+    
+    private Coordinate findTranslatedCoordinatetes(int xMovement, int yMovement, Coordinate coordinate)
+    {
+        return new Coordinate(coordinate.x + xMovement, coordinate.y + yMovement);
+    }
+
+    public Coordinate findRotatedTranslatedPixelLocation(Pixel pixel, int xMovement, int yMovement,
+        Direction direction)
+    {
+        var rotatedLocation = findPixelRotatedCoordinates(direction, pixel.coordinate);
+        var rotatedAndTranslatedLocation = findTranslatedCoordinatetes(xMovement, yMovement, rotatedLocation);
+        return rotatedAndTranslatedLocation;
+    }
+    
+
         
     private void IShape()
     {

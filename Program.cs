@@ -99,4 +99,5 @@ public enum Direction
 {
     Clockwise = 1,
     CounterClockwise = -1,
+    None = 0,
 }

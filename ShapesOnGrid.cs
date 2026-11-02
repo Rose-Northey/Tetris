@@ -140,7 +140,7 @@ public class ShapesOnGrid
     
     public void rotateFallingShape(Direction direction)
     {
-        if (isRotationMovementIllegal(direction))
+        if (!isRotationMovementIllegal(direction))
         {
             fallingShape.rotateShape(direction);
         }
@@ -162,11 +162,8 @@ public class ShapesOnGrid
         foreach (var pixel in fallingShape.PixelsInShape)
         {
             var (movementX, movementY) = coordinate;
-            var rotatedCoordinate= fallingShape.findRotatedCoordinates(direction, pixel);
-            if (!isPixelMovementAllowed(movementX, movementY, rotatedCoordinate))
-            {
-                return false;
-            }
+            var rotatedCoordinate = fallingShape.findRotatedTranslatedPixelLocation(pixel,movementX,movementY,Direction.None);
+      
         }
 
         return true;
@@ -206,8 +203,12 @@ public class ShapesOnGrid
     private bool isPixelMovementAllowed(int xMovement, int yMovement, Coordinate pixelLocation)
     {
         var aspiringLocation = new Coordinate(pixelLocation.x + xMovement, pixelLocation.y + yMovement);
-        if (isLocatedOutsideGrid(aspiringLocation)) return false;
-        return isLocationEmpty(aspiringLocation);
+        return isLocationAllowed(aspiringLocation);
+    }
+
+    private bool isLocationAllowed(Coordinate location)
+    {
+        return !isLocatedOutsideGrid(location) && isLocationEmpty(location);
     }
 
 
@@ -215,12 +216,14 @@ public class ShapesOnGrid
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
-            var aspiringLocation = fallingShape.findRotatedCoordinates(direction, pixel);
-            if (isLocatedOutsideGrid(aspiringLocation)) return false;
-            return isLocationEmpty(aspiringLocation);
+            var aspiringLocation = fallingShape.findRotatedTranslatedPixelLocation(pixel,0,0,direction);
+            if (!isLocationAllowed(aspiringLocation)) return true;
         }
         return false;
     }
+
+  
+    
 
     private void removeFullRows()
     {
