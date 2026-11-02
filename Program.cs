@@ -6,11 +6,10 @@ using Tetris;
 
 internal static class Program
 {
-    private const int pixelWidth = 30;
     private const int nXPixelsInWindow = 30;
     private const int nYPixelsInWindow = 30;
-    private const int windowWidth = pixelWidth * nXPixelsInWindow;
-    private const int windowHeight = pixelWidth * nYPixelsInWindow;
+    private const int windowWidth = Pixel.Width * nXPixelsInWindow;
+    private const int windowHeight = Pixel.Width * nYPixelsInWindow;
  
     private static readonly Color colourOfBG= Color.FromHSV(222, 0.55f, 0.18f);
 
@@ -19,7 +18,7 @@ internal static class Program
     {
         var gameState = new GameState
         {
-            ShapesOnGrid = new ShapesOnGrid(windowWidth,windowHeight, pixelWidth)
+            ShapesOnGrid = new ShapesOnGrid(windowWidth,windowHeight)
         };
         gameState.ShapesOnGrid.onRowClear = gameState.onRowClear;
         gameState.Reset();

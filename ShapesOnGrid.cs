@@ -12,7 +12,6 @@ public class ShapesOnGrid
     private const int nYPixelsInGrid= 10;
     private Shape fallingShape;
     private Queue<Shape> waitingShapes;
-    private readonly int gridSquareSize;
     private List<Pixel> settledPixels;
     private static readonly Color colourOfGridFill = Color.FromHSV(222, 0.50f, 0.22f);
     private static readonly Color colourOfGridBorder = Color.FromHSV(188, 0.80f, 0.85f);
@@ -21,27 +20,26 @@ public class ShapesOnGrid
     public Action onRowClear;
   
     
-    public ShapesOnGrid(int windowWidth, int windowHeight, int pixelWidth)
+    public ShapesOnGrid(int windowWidth, int windowHeight)
     {
-        xOrigin = (windowWidth - pixelWidth * nXPixelsInGrid) / 2;
-        yOrigin = (windowHeight - pixelWidth * nYPixelsInGrid) / 2;
-        gridSquareSize = pixelWidth;
+        xOrigin = (windowWidth - Pixel.Width * nXPixelsInGrid) / 2;
+        yOrigin = (windowHeight - Pixel.Width * nYPixelsInGrid) / 2;
         ResetGrid();
         onRowClear = () => {};
     }
     
     private void DrawGrid()
     {
-        var widthGrid = nXPixelsInGrid * gridSquareSize;
-        var heightGrid = nYPixelsInGrid * gridSquareSize;
+        var widthGrid = nXPixelsInGrid * Pixel.Width;
+        var heightGrid = nYPixelsInGrid * Pixel.Width;
         const int lineWidth = 1;
         Raylib.DrawRectangle(xOrigin, yOrigin, widthGrid, heightGrid,colourOfGridFill);
      
-        for (var i = xOrigin; i <= widthGrid+xOrigin; i+= gridSquareSize)
+        for (var i = xOrigin; i <= widthGrid+xOrigin; i+= Pixel.Width)
         {
             Raylib.DrawRectangle(i, yOrigin,lineWidth, heightGrid, colourOfGridLines);
         }
-        for (var i = yOrigin; i <= heightGrid + yOrigin; i += gridSquareSize)
+        for (var i = yOrigin; i <= heightGrid + yOrigin; i += Pixel.Width)
         {
             Raylib.DrawRectangle(xOrigin, i, widthGrid, lineWidth, colourOfGridLines);
         }
@@ -100,8 +98,8 @@ public class ShapesOnGrid
 
     private Coordinate gridToWindowCoordinates(Coordinate gridLocation)
     {
-        var windowX = gridLocation.x * gridSquareSize + xOrigin;
-        var windowY = gridLocation.y * gridSquareSize + yOrigin;
+        var windowX = gridLocation.x * Pixel.Width + xOrigin;
+        var windowY = gridLocation.y * Pixel.Width + yOrigin;
         return new Coordinate(windowX, windowY);
     }
 
