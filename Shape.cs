@@ -9,7 +9,7 @@ public class Shape
     private float xOffset;
     private float yOffset;
     public readonly Orientation currentOrientation;
-    public Dictionary<(Orientation initial, Orientation next), List<(int x, int y)>> wallKickLookup;
+    public Dictionary<(Orientation initial, Orientation next), List<Coordinate>> wallKickLookup;
     
     public Shape(int x, int y)
     {
@@ -61,12 +61,12 @@ public class Shape
         };
     }
 
-    public void moveShape(int x, int y)
+    public void moveShape(Coordinate translation)
     {
-        center = new Coordinate(center.x+x, center.y+y);
+        center = new Coordinate(center.x+translation.x, center.y+translation.y);
         foreach (var pixel in PixelsInShape)
         {
-            pixel.coordinate = new Coordinate(pixel.coordinate.x + x, pixel.coordinate.y + y);
+            pixel.coordinate = new Coordinate(pixel.coordinate.x + translation.x, pixel.coordinate.y + translation.y);
         }
     }
 
@@ -220,35 +220,35 @@ public class Shape
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
-    private Dictionary<(Orientation initial, Orientation next), List<(int x,int y)>> findWallKickLookupForIShape()
+    private Dictionary<(Orientation initial, Orientation next), List<Coordinate>> findWallKickLookupForIShape()
     {
         var data = new List<WallKickData>
         {
-            new (initialOrientation: Orientation.zero,  Orientation.right, [(0,0),(-2,0),(1,0),(-2,-1),(1,2)]),
-            new (initialOrientation: Orientation.right, Orientation.zero,  [(0,0),(2,0),(-1,0),(2,1),(-1,-2)]),
-            new (initialOrientation: Orientation.right, Orientation.two,   [(0,0),(-1,0),(2,0),(-1,2),(2,-1)]),
-            new (initialOrientation: Orientation.two,   Orientation.right, [(0,0),(1,0),(-2,0),(1,-2),(-2,1)]),
-            new (initialOrientation: Orientation.two,   Orientation.left,  [(0,0),(2,0),(-1,0),(2,1),(-1,-2)]),
-            new (initialOrientation: Orientation.left,  Orientation.two,   [(0,0),(-2,0),(1,0),(-2,-1),(1,2)]),
-            new (initialOrientation: Orientation.left,  Orientation.zero,  [(0,0),(1,0),(-2,0),(1,-2),(-2,1)]),
-            new (initialOrientation: Orientation.zero,  Orientation.left,  [(0,0),(-1,0),(2,0),(-1,2),(2,-1)]),
+            new (initialOrientation: Orientation.zero,  Orientation.right, [new Coordinate(0,0), new Coordinate(-2,0), new Coordinate(1,0),  new Coordinate(-2,-1), new Coordinate(1,2)]),
+            new (initialOrientation: Orientation.right, Orientation.zero,  [new Coordinate(0,0), new Coordinate(2,0),  new Coordinate(-1,0), new Coordinate(2,1),   new Coordinate(-1,-2)]),
+            new (initialOrientation: Orientation.right, Orientation.two,   [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(2,0),  new Coordinate(-1,2),  new Coordinate(2,-1)]),
+            new (initialOrientation: Orientation.two,   Orientation.right, [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(-2,0), new Coordinate(1,-2),  new Coordinate(-2,1)]),
+            new (initialOrientation: Orientation.two,   Orientation.left,  [new Coordinate(0,0), new Coordinate(2,0),  new Coordinate(-1,0), new Coordinate(2,1),   new Coordinate(-1,-2)]),
+            new (initialOrientation: Orientation.left,  Orientation.two,   [new Coordinate(0,0), new Coordinate(-2,0), new Coordinate(1,0),  new Coordinate(-2,-1), new Coordinate(1,2)]),
+            new (initialOrientation: Orientation.left,  Orientation.zero,  [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(-2,0), new Coordinate(1,-2),  new Coordinate(-2,1)]),
+            new (initialOrientation: Orientation.zero,  Orientation.left,  [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(2,0),  new Coordinate(-1,2),  new Coordinate(2,-1)]),
         };
         return data.ToDictionary(x => (initial: x.initialOrientation, next: x.nextOrientation),x => x.wallKickCoordinates);
     }
     
 
-    private Dictionary <(Orientation initial, Orientation next), List<(int x,int y)>> findWallKickLookupForJLSTZShapes()
+    private Dictionary <(Orientation initial, Orientation next), List<Coordinate>> findWallKickLookupForJLSTZShapes()
     {
         var data = new List<WallKickData>
         {
-            new (initialOrientation: Orientation.zero,  Orientation.right, [(0,0),(-1,0),(-1,1),(0,-2),(-1,-2)]),
-            new (initialOrientation: Orientation.right, Orientation.zero,  [(0,0),(1,0),(1,-1),(0,2),(1,2)]),
-            new (initialOrientation: Orientation.right, Orientation.two,   [(0,0),(1,0),(1,-1),(0,2),(1,2)]),
-            new (initialOrientation: Orientation.two,   Orientation.right, [(0,0),(-1,0),(-1,1),(0,-2),(-1,-2)]),
-            new (initialOrientation: Orientation.two,   Orientation.left,  [(0,0),(1,0),(1,1),(0,-2),(1,-2)]),
-            new (initialOrientation: Orientation.left,  Orientation.two,   [(0,0),(-1,0),(-1,-1),(0,2),(-1,2)]),
-            new (initialOrientation: Orientation.left,  Orientation.zero,  [(0,0),(-1,0),(-1,-1),(0,2),(-1,2)]),
-            new (initialOrientation: Orientation.zero,  Orientation.left,  [(0,0),(1,0),(1,1),(0,-2),(1,-2)]),
+            new (initialOrientation: Orientation.zero,  Orientation.right, [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(-1,1),  new Coordinate(0,-2), new Coordinate(-1,-2)]),
+            new (initialOrientation: Orientation.right, Orientation.zero,  [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(1,-1),  new Coordinate(0,2),  new Coordinate(1,2)]),
+            new (initialOrientation: Orientation.right, Orientation.two,   [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(1,-1),  new Coordinate(0,2),  new Coordinate(1,2)]),
+            new (initialOrientation: Orientation.two,   Orientation.right, [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(-1,1),  new Coordinate(0,-2), new Coordinate(-1,-2)]),
+            new (initialOrientation: Orientation.two,   Orientation.left,  [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(1,1),   new Coordinate(0,-2), new Coordinate(1,-2)]),
+            new (initialOrientation: Orientation.left,  Orientation.two,   [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(-1,-1), new Coordinate(0,2),  new Coordinate(-1,2)]),
+            new (initialOrientation: Orientation.left,  Orientation.zero,  [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(-1,-1), new Coordinate(0,2),  new Coordinate(-1,2)]),
+            new (initialOrientation: Orientation.zero,  Orientation.left,  [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(1,1),   new Coordinate(0,-2), new Coordinate(1,-2)]),
         };
         return data.ToDictionary(x => (initial: x.initialOrientation, next: x.nextOrientation),x => x.wallKickCoordinates);
     }

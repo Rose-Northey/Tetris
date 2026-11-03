@@ -125,23 +125,23 @@ public class ShapesOnGrid
     private void enactGravity()
     {
         
-        if (isShapeMovementAllowed(fallingShape,Direction.None,0, 1))
+        if (isShapeMovementAllowed(fallingShape,Direction.None,new Coordinate(0,1)))
         {
-            fallingShape.moveShape(0, 1);
+            fallingShape.moveShape(new Coordinate(0, 1));
             return;
         }
         setFallingShape();
     }
     
-    public void moveFallingShape(int x, int y)
+    public void moveFallingShape(Coordinate movement)
     {
-        if(!isShapeMovementAllowed(fallingShape,Direction.None, x,y)) return;
-        fallingShape.moveShape(x, y);
+        if(!isShapeMovementAllowed(fallingShape,Direction.None, movement)) return;
+        fallingShape.moveShape(movement);
     }
     
     public void rotateFallingShape(Direction direction)
     {
-        if (isShapeMovementAllowed(fallingShape, direction,0,0))
+        if (isShapeMovementAllowed(fallingShape, direction,new Coordinate(0,0)))
         {
             fallingShape.rotateShape(direction);
         }
@@ -153,12 +153,12 @@ public class ShapesOnGrid
         {
             if (!coordinateIsViable(coordinate, direction)) continue;
             fallingShape.rotateShape(direction);
-            fallingShape.moveShape(coordinate.x, coordinate.y);
+            fallingShape.moveShape(coordinate);
         }
     }
     //TODO: Is it possible that is coordinate viable method replaces some methods?? supply both movement and rotation
 
-    private bool coordinateIsViable((int x, int y) coordinate,Direction direction )
+    private bool coordinateIsViable(Coordinate coordinate,Direction direction )
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
@@ -197,11 +197,11 @@ public class ShapesOnGrid
         return !isLocatedOutsideGrid(location) && isLocationEmpty(location);
     }
 
-    private bool isShapeMovementAllowed(Shape shape, Direction direction,int xMovement,int yMovement)
+    private bool isShapeMovementAllowed(Shape shape, Direction direction,Coordinate movement)
     {
         foreach (var pixel in shape.PixelsInShape)
         {
-            var aspiringLocation = shape.findRotatedTranslatedPixelLocation(pixel,xMovement,yMovement,direction);
+            var aspiringLocation = shape.findRotatedTranslatedPixelLocation(pixel,movement.x,movement.y,direction);
             if (!isLocationAllowed(aspiringLocation)) return false;
         }
         return true;
