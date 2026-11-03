@@ -6,8 +6,7 @@ public class ShapesOnGrid
 {
     private int nWidth;
     private int nHeight;
-    private readonly int xOrigin;
-    private readonly int yOrigin;
+    private readonly Coordinate origin;
     private const int nXPixelsInGrid= 5;
     private const int nYPixelsInGrid= 10;
     private Shape fallingShape;
@@ -22,8 +21,9 @@ public class ShapesOnGrid
     
     public ShapesOnGrid(int windowWidth, int windowHeight)
     {
-        xOrigin = (windowWidth - Pixel.Width * nXPixelsInGrid) / 2;
-        yOrigin = (windowHeight - Pixel.Width * nYPixelsInGrid) / 2;
+        var xOrigin = (windowWidth - Pixel.Width * nXPixelsInGrid) / 2;
+        var yOrigin = (windowHeight - Pixel.Width * nYPixelsInGrid) / 2;
+        origin = new Coordinate(xOrigin, yOrigin);
         ResetGrid();
         onRowClear = () => {};
     }
@@ -33,17 +33,17 @@ public class ShapesOnGrid
         var widthGrid = nXPixelsInGrid * Pixel.Width;
         var heightGrid = nYPixelsInGrid * Pixel.Width;
         const int lineWidth = 1;
-        Raylib.DrawRectangle(xOrigin, yOrigin, widthGrid, heightGrid,colourOfGridFill);
+        Raylib.DrawRectangle(origin.x, origin.y, widthGrid, heightGrid,colourOfGridFill);
      
-        for (var i = xOrigin; i <= widthGrid+xOrigin; i+= Pixel.Width)
+        for (var i = origin.x; i <= widthGrid+origin.x; i+= Pixel.Width)
         {
-            Raylib.DrawRectangle(i, yOrigin,lineWidth, heightGrid, colourOfGridLines);
+            Raylib.DrawRectangle(i, origin.y,lineWidth, heightGrid, colourOfGridLines);
         }
-        for (var i = yOrigin; i <= heightGrid + yOrigin; i += Pixel.Width)
+        for (var i = origin.y; i <= heightGrid + origin.y; i += Pixel.Width)
         {
-            Raylib.DrawRectangle(xOrigin, i, widthGrid, lineWidth, colourOfGridLines);
+            Raylib.DrawRectangle(origin.x, i, widthGrid, lineWidth, colourOfGridLines);
         }
-        Raylib.DrawRectangleLines(xOrigin-1, yOrigin-1, widthGrid+2, heightGrid+2, colourOfGridBorder);
+        Raylib.DrawRectangleLines(origin.x-1, origin.y-1, widthGrid+2, heightGrid+2, colourOfGridBorder);
     }
     
 
@@ -98,8 +98,8 @@ public class ShapesOnGrid
 
     private Coordinate gridToWindowCoordinates(Coordinate gridLocation)
     {
-        var windowX = gridLocation.x * Pixel.Width + xOrigin;
-        var windowY = gridLocation.y * Pixel.Width + yOrigin;
+        var windowX = gridLocation.x * Pixel.Width + origin.x;
+        var windowY = gridLocation.y * Pixel.Width + origin.y;
         return new Coordinate(windowX, windowY);
     }
 
@@ -158,15 +158,13 @@ public class ShapesOnGrid
     }
     //TODO: Is it possible that is coordinate viable method replaces some methods?? supply both movement and rotation
 
-    private bool coordinateIsViable(Coordinate coordinate,Direction direction )
+    private bool coordinateIsViable(Coordinate translation,Direction rotation )
     {
         foreach (var pixel in fallingShape.PixelsInShape)
         {
-            var (movementX, movementY) = coordinate;
-            var rotatedCoordinate = fallingShape.findRotatedTranslatedPixelLocation(pixel,movementX,movementY,Direction.None);
-      
+            var newLocation = fallingShape.findRotatedTranslatedPixelLocation(pixel,translation,rotation);
+            if (!isLocationAllowed(newLocation))return false;
         }
-
         return true;
     }
 
@@ -201,7 +199,7 @@ public class ShapesOnGrid
     {
         foreach (var pixel in shape.PixelsInShape)
         {
-            var aspiringLocation = shape.findRotatedTranslatedPixelLocation(pixel,movement.x,movement.y,direction);
+            var aspiringLocation = shape.findRotatedTranslatedPixelLocation(pixel,movement,direction);
             if (!isLocationAllowed(aspiringLocation)) return false;
         }
         return true;

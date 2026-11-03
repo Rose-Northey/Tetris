@@ -124,16 +124,16 @@ public class Shape
         return new Coordinate(aspiringX, aspiringY);
     }
     
-    private Coordinate findTranslatedCoordinatetes(int xMovement, int yMovement, Coordinate coordinate)
+    private Coordinate findTranslatedCoordinatetes(Coordinate translation, Coordinate originalLocation)
     {
-        return new Coordinate(coordinate.x + xMovement, coordinate.y + yMovement);
+        return new Coordinate(originalLocation.x + translation.x, originalLocation.y + translation.y);
     }
 
-    public Coordinate findRotatedTranslatedPixelLocation(Pixel pixel, int xMovement, int yMovement,
-        Direction direction)
+    public Coordinate findRotatedTranslatedPixelLocation(Pixel pixel, Coordinate translation,
+        Direction rotation)
     {
-        var rotatedLocation = findPixelRotatedCoordinates(direction, pixel.coordinate);
-        var rotatedAndTranslatedLocation = findTranslatedCoordinatetes(xMovement, yMovement, rotatedLocation);
+        var rotatedLocation = findPixelRotatedCoordinates(rotation, pixel.coordinate);
+        var rotatedAndTranslatedLocation = findTranslatedCoordinatetes(translation, rotatedLocation);
         return rotatedAndTranslatedLocation;
     }
     
