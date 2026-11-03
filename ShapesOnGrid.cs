@@ -156,7 +156,7 @@ public class ShapesOnGrid
             fallingShape.moveShape(coordinate);
         }
     }
-    //TODO: Is it possible that is coordinate viable method replaces some methods?? supply both movement and rotation
+
 
     private bool coordinateIsViable(Coordinate translation,Direction rotation )
     {
