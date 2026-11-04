@@ -192,7 +192,7 @@ public class ShapesOnGrid
 
     private bool isLocationAllowed(Coordinate location)
     {
-        return !isLocatedOutsideGrid(location) && isLocationEmpty(location);
+        return isLocatedInsideGrid(location) && isLocationEmpty(location);
     }
 
     private bool isShapeMovementAllowed(Shape shape, Direction direction,Coordinate movement)
@@ -217,10 +217,12 @@ public class ShapesOnGrid
         }
     }
 
-    private bool isLocatedOutsideGrid(Coordinate location)
+    private bool isLocatedInsideGrid(Coordinate location)
     {
-        if (location.x is < 0 or > nXPixelsInGrid - 1) return true;
-        return location.y > nYPixelsInGrid - 1;
+        var isTooFarLeftOrRight = location.x is < 0 or > nXPixelsInGrid - 1;
+        var isTooFarDown = location.y > nYPixelsInGrid - 1;
+        return !isTooFarLeftOrRight && !isTooFarDown;
+
     }
 
     private bool isLocationEmpty(Coordinate location)
