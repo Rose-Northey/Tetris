@@ -61,7 +61,7 @@ public class ShapesOnGrid
     public void DrawFrame()
     {
         DrawGrid();
-        foreach (var pixel in fallingShape.PixelsInShape)
+        foreach (var pixel in fallingShape.pixels)
         { 
             if (pixel.coordinate.y<0) continue;
             DrawPixel(pixel);
@@ -82,7 +82,7 @@ public class ShapesOnGrid
                     
         foreach (var shape in waitingShapes)
         {
-            foreach (var pixel in shape.PixelsInShape)
+            foreach (var pixel in shape.pixels)
             {
                 var diffX = pixel.coordinate.x - shape.center.x;
                 var diffY = pixel.coordinate.y - shape.center.y;
@@ -141,36 +141,29 @@ public class ShapesOnGrid
     
     public void rotateFallingShape(Direction direction)
     {
-        if (isShapeMovementAllowed(fallingShape, direction,new Coordinate(0,0)))
-        {
-            fallingShape.rotateShape(direction);
-        }
         var currentOrientation = fallingShape.currentOrientation;
         var newOrientation = fallingShape.FindNewOrientation(direction);
         if (fallingShape.wallKickLookup == null) return;
         var wallKickCoordinates = fallingShape.wallKickLookup[(initial:currentOrientation, next: newOrientation)];
-        foreach (var coordinate in wallKickCoordinates)
-        {
-            if (!coordinateIsViable(coordinate, direction)) continue;
-            fallingShape.rotateShape(direction);
-            fallingShape.moveShape(coordinate);
-        }
+        var viableWallKickTranslation = wallKickCoordinates.FirstOrDefault(coordinate => coordinateIsViable(coordinate, direction),null);
+        if (viableWallKickTranslation is null) return;
+        fallingShape.rotateShape(direction);
+        fallingShape.moveShape(viableWallKickTranslation);
     }
 
 
     private bool coordinateIsViable(Coordinate translation,Direction rotation )
     {
-        foreach (var pixel in fallingShape.PixelsInShape)
+        return fallingShape.pixels.All(pixel =>
         {
-            var newLocation = fallingShape.findRotatedTranslatedPixelLocation(pixel,translation,rotation);
-            if (!isLocationAllowed(newLocation))return false;
-        }
-        return true;
+            var newLocation = fallingShape.findRotatedTranslatedPixelLocation(pixel, translation, rotation);
+            return isPlacementAllowed(newLocation);
+        });
     }
 
     private void setFallingShape()
     {
-        foreach (var pixel in fallingShape.PixelsInShape)
+        foreach (var pixel in fallingShape.pixels)
         {
             pixel.color.GetHSV(out var h, out var s, out var v);
             pixel.color = Color.FromHSV(h, s - 0.1f, v - 0.1f);
@@ -190,19 +183,18 @@ public class ShapesOnGrid
         return false;
     }
 
-    private bool isLocationAllowed(Coordinate location)
+    private bool isPlacementAllowed(Coordinate location)
     {
-        return isLocatedInsideGrid(location) && isLocationEmpty(location);
+        return isLocatedInsideGrid(location) && isLocationFree(location);
     }
 
     private bool isShapeMovementAllowed(Shape shape, Direction direction,Coordinate movement)
     {
-        foreach (var pixel in shape.PixelsInShape)
+        return shape.pixels.All(pixel =>
         {
-            var aspiringLocation = shape.findRotatedTranslatedPixelLocation(pixel,movement,direction);
-            if (!isLocationAllowed(aspiringLocation)) return false;
-        }
-        return true;
+            var aspiringLocation = shape.findRotatedTranslatedPixelLocation(pixel, movement, direction);
+            return isPlacementAllowed(aspiringLocation);
+        });
     }
 
     private void removeFullRows()
@@ -219,15 +211,15 @@ public class ShapesOnGrid
 
     private bool isLocatedInsideGrid(Coordinate location)
     {
-        var isTooFarLeftOrRight = location.x is < 0 or > nXPixelsInGrid - 1;
-        var isTooFarDown = location.y > nYPixelsInGrid - 1;
-        return !isTooFarLeftOrRight && !isTooFarDown;
-
+        var isXInBounds = location.x >= 0 && location.x < nXPixelsInGrid;
+        var isYInBounds = location.y <= nYPixelsInGrid - 1;
+        return isXInBounds && isYInBounds;
     }
 
-    private bool isLocationEmpty(Coordinate location)
+    private bool isLocationFree(Coordinate location)
     {
-        return !settledPixels.Any((pixel) => pixel.coordinate.x == location.x && pixel.coordinate.y == location.y);
+        var locationIsTaken = settledPixels.Any((pixel) => pixel.coordinate.x == location.x && pixel.coordinate.y == location.y);
+        return !locationIsTaken;
     }
     
     private bool isRowFull(IEnumerable<Pixel> pixelsInRow)

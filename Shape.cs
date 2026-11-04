@@ -4,7 +4,7 @@ namespace Tetris;
 
 public class Shape
 {
-    public readonly List<Pixel> PixelsInShape = [];
+    public readonly List<Pixel> pixels = [];
     public Coordinate center;
     private float xOffset;
     private float yOffset;
@@ -40,7 +40,7 @@ public class Shape
     private void colorShape()
     {
         var randomColor = GenerateColor();
-        foreach (var pixel in PixelsInShape)
+        foreach (var pixel in pixels)
         {
             pixel.color = randomColor;
         }
@@ -64,7 +64,7 @@ public class Shape
     public void moveShape(Coordinate translation)
     {
         center = new Coordinate(center.x+translation.x, center.y+translation.y);
-        foreach (var pixel in PixelsInShape)
+        foreach (var pixel in pixels)
         {
             pixel.coordinate = new Coordinate(pixel.coordinate.x + translation.x, pixel.coordinate.y + translation.y);
         }
@@ -76,7 +76,7 @@ public class Shape
         //find prospective so we can use it in the wallkick data
         //figure out whether the rotation will work first
         //if the rotation won't work, try each wall kick translation otherwise, do nothing
-        foreach (var pixel in PixelsInShape)
+        foreach (var pixel in pixels)
         {
             var (aspiringX, aspiringY) = findPixelRotatedCoordinates(direction, pixel.coordinate);
             pixel.coordinate = new Coordinate(aspiringX, aspiringY);
@@ -148,7 +148,7 @@ public class Shape
         var pixel4 = new Pixel(center with { y = center.y + 1 });
         xOffset = -0.5F;
         yOffset = -0.5F;
-        PixelsInShape.AddRange(pixel1,pixel2, pixel3,pixel4);
+        pixels.AddRange(pixel1,pixel2, pixel3,pixel4);
         wallKickLookup = findWallKickLookupForIShape();
     }
     
@@ -161,7 +161,7 @@ public class Shape
         
         xOffset = -0.5F;
         yOffset = -0.5F;
-        PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        pixels.AddRange(pixel1, pixel2, pixel3, pixel4);
     }
 
     private void TShape()
@@ -171,7 +171,7 @@ public class Shape
         var pixel3 = new Pixel(center);
         var pixel4 = new Pixel(center with { x = center.x + 1 });
 
-        PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        pixels.AddRange(pixel1, pixel2, pixel3, pixel4);
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
@@ -182,7 +182,7 @@ public class Shape
         var pixel3 = new Pixel(center with { y = center.y - 1 });
         var pixel4 = new Pixel(new Coordinate(center.x+1, center.y-1));
 
-        PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        pixels.AddRange(pixel1, pixel2, pixel3, pixel4);
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
     
@@ -193,7 +193,7 @@ public class Shape
         var pixel3 = new Pixel(center);
         var pixel4 = new Pixel(center with { x = center.x + 1 });
         
-        PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        pixels.AddRange(pixel1, pixel2, pixel3, pixel4);
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
     
@@ -205,7 +205,7 @@ public class Shape
         var pixel3 = new Pixel(center);
         var pixel4 = new Pixel(center with { x = center.x + 1 });
 
-        PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        pixels.AddRange(pixel1, pixel2, pixel3, pixel4);
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
@@ -216,7 +216,7 @@ public class Shape
         var pixel3 = new Pixel(center);
         var pixel4 = new Pixel(center with { x = center.x + 1 });
         
-        PixelsInShape.AddRange(pixel1, pixel2, pixel3, pixel4);
+        pixels.AddRange(pixel1, pixel2, pixel3, pixel4);
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
