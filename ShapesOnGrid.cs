@@ -127,32 +127,32 @@ public class ShapesOnGrid
         
         if (isShapeMovementAllowed(fallingShape,Direction.None,new Coordinate(0,1)))
         {
-            fallingShape.moveShape(new Coordinate(0, 1));
+            fallingShape.ActuallyTranslateShape(new Coordinate(0, 1));
             return;
         }
         setFallingShape();
     }
     
-    public void moveFallingShape(Coordinate movement)
+    public void translateFallingShape(Coordinate movement)
     {
         if(!isShapeMovementAllowed(fallingShape,Direction.None, movement)) return;
-        fallingShape.moveShape(movement);
+        fallingShape.ActuallyTranslateShape(movement);
     }
     
     public void rotateFallingShape(Direction direction)
     {
-        var currentOrientation = fallingShape.currentOrientation;
-        var newOrientation = fallingShape.FindNewOrientation(direction);
+        var initialOrientation = fallingShape.currentOrientation;
+        var nextOrientation = fallingShape.FindNewOrientation(direction);
         if (fallingShape.wallKickLookup == null) return;
-        var wallKickCoordinates = fallingShape.wallKickLookup[(initial:currentOrientation, next: newOrientation)];
-        var viableWallKickTranslation = wallKickCoordinates.FirstOrDefault(coordinate => coordinateIsViable(coordinate, direction),null);
+        var wallKickCoordinates = fallingShape.wallKickLookup[(initial:initialOrientation, next: nextOrientation)];
+        var viableWallKickTranslation = wallKickCoordinates.FirstOrDefault(coordinate => isWallKickViable(coordinate, direction),null);
         if (viableWallKickTranslation is null) return;
-        fallingShape.rotateShape(direction);
-        fallingShape.moveShape(viableWallKickTranslation);
+        fallingShape.ActuallyRotateShape(direction);
+        fallingShape.ActuallyTranslateShape(viableWallKickTranslation);
     }
 
 
-    private bool coordinateIsViable(Coordinate translation,Direction rotation )
+    private bool isWallKickViable(Coordinate translation,Direction rotation )
     {
         return fallingShape.pixels.All(pixel =>
         {
@@ -209,7 +209,7 @@ public class ShapesOnGrid
         }
     }
 
-    private bool isLocatedInsideGrid(Coordinate location)
+    private static bool isLocatedInsideGrid(Coordinate location)
     {
         var isXInBounds = location.x >= 0 && location.x < nXPixelsInGrid;
         var isYInBounds = location.y <= nYPixelsInGrid - 1;

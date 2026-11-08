@@ -75,9 +75,9 @@ internal static class Program
 
     private static void handleInput(GameState gameState)
     {
-        if (Raylib.IsKeyPressed(KeyboardKey.Left)) gameState.ShapesOnGrid.moveFallingShape(new Coordinate(-1, 0));
-        if (Raylib.IsKeyPressed(KeyboardKey.Right)) gameState.ShapesOnGrid.moveFallingShape(new Coordinate(1, 0)); 
-        if (Raylib.IsKeyPressed(KeyboardKey.Down)) gameState.ShapesOnGrid.moveFallingShape(new Coordinate(0, 1));
+        if (Raylib.IsKeyPressed(KeyboardKey.Left)) gameState.ShapesOnGrid.translateFallingShape(new Coordinate(-1, 0));
+        if (Raylib.IsKeyPressed(KeyboardKey.Right)) gameState.ShapesOnGrid.translateFallingShape(new Coordinate(1, 0)); 
+        if (Raylib.IsKeyPressed(KeyboardKey.Down)) gameState.ShapesOnGrid.translateFallingShape(new Coordinate(0, 1));
         if (Raylib.IsKeyPressed(KeyboardKey.Up)) gameState.ShapesOnGrid.rotateFallingShape(Direction.Clockwise);
         if (Raylib.IsKeyPressed(KeyboardKey.Z)) gameState.ShapesOnGrid.rotateFallingShape(Direction.CounterClockwise);
     }

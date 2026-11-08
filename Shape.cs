@@ -61,7 +61,7 @@ public class Shape
         };
     }
 
-    public void moveShape(Coordinate translation)
+    public void ActuallyTranslateShape(Coordinate translation)
     {
         center = new Coordinate(center.x+translation.x, center.y+translation.y);
         foreach (var pixel in pixels)
@@ -70,19 +70,15 @@ public class Shape
         }
     }
 
-    public void rotateShape(Direction direction)
+    public void ActuallyRotateShape(Direction direction)
     {
-        var prospectiveOrientation = FindNewOrientation(direction);
-        //find prospective so we can use it in the wallkick data
-        //figure out whether the rotation will work first
-        //if the rotation won't work, try each wall kick translation otherwise, do nothing
         foreach (var pixel in pixels)
         {
             var (aspiringX, aspiringY) = findPixelRotatedCoordinates(direction, pixel.coordinate);
             pixel.coordinate = new Coordinate(aspiringX, aspiringY);
         }
-        
     }
+    
 
     public Orientation FindNewOrientation(Direction direction)
     {
