@@ -8,7 +8,7 @@ public class Shape
     public Coordinate center;
     private float xOffset;
     private float yOffset;
-    public readonly Orientation currentOrientation;
+    public Orientation currentOrientation;
     public Dictionary<(Orientation initial, Orientation next), List<Coordinate>> wallKickLookup;
     
     public Shape(int x, int y)
@@ -72,6 +72,7 @@ public class Shape
 
     public void ActuallyRotateShape(Direction direction)
     {
+        currentOrientation = FindNewOrientation(direction);
         foreach (var pixel in pixels)
         {
             var (aspiringX, aspiringY) = findPixelRotatedCoordinates(direction, pixel.coordinate);
