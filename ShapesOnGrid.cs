@@ -106,7 +106,7 @@ public class ShapesOnGrid
 
     private void SpawnShape()
     {
-        var newShape = new Shape(nXPixelsInGrid / 2, -1);
+        var newShape = ShapeFactory.create(new Coordinate(nXPixelsInGrid / 2, -1));
         waitingShapes.Enqueue(newShape);
     }
     

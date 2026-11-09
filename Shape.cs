@@ -2,18 +2,18 @@ using Raylib_cs;
 
 namespace Tetris;
 
-public class Shape
+public abstract class Shape
 {
     public readonly List<Pixel> pixels = [];
     public Coordinate center;
-    private float xOffset;
-    private float yOffset;
+    protected float xOffset;
+    protected float yOffset;
     public Orientation currentOrientation;
     public Dictionary<(Orientation initial, Orientation next), List<Coordinate>> wallKickLookup;
     
-    public Shape(int x, int y)
+    public Shape(Coordinate center)
     {
-        center = new Coordinate(x, y);
+        this.center = center;
         xOffset = 0;
         yOffset = 0;
         var buildShape = GenerateShapeRecipe();
@@ -136,18 +136,7 @@ public class Shape
     
 
         
-    private void IShape()
-    {
-        center = center with { y = center.y - 1 };
-        var pixel1 = new Pixel(center with {y=center.y-1});
-        var pixel2 = new Pixel(center with {y=center.y-2});
-        var pixel3 = new Pixel(center);
-        var pixel4 = new Pixel(center with { y = center.y + 1 });
-        xOffset = -0.5F;
-        yOffset = -0.5F;
-        pixels.AddRange(pixel1,pixel2, pixel3,pixel4);
-        wallKickLookup = findWallKickLookupForIShape();
-    }
+
     
     private void OShape()
     {
@@ -217,38 +206,9 @@ public class Shape
         wallKickLookup = findWallKickLookupForJLSTZShapes();
     }
 
-    private Dictionary<(Orientation initial, Orientation next), List<Coordinate>> findWallKickLookupForIShape()
-    {
-        var data = new List<WallKickData>
-        {
-            new (initialOrientation: Orientation.zero,  Orientation.right, [new Coordinate(0,0), new Coordinate(-2,0), new Coordinate(1,0),  new Coordinate(-2,-1), new Coordinate(1,2)]),
-            new (initialOrientation: Orientation.right, Orientation.zero,  [new Coordinate(0,0), new Coordinate(2,0),  new Coordinate(-1,0), new Coordinate(2,1),   new Coordinate(-1,-2)]),
-            new (initialOrientation: Orientation.right, Orientation.two,   [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(2,0),  new Coordinate(-1,2),  new Coordinate(2,-1)]),
-            new (initialOrientation: Orientation.two,   Orientation.right, [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(-2,0), new Coordinate(1,-2),  new Coordinate(-2,1)]),
-            new (initialOrientation: Orientation.two,   Orientation.left,  [new Coordinate(0,0), new Coordinate(2,0),  new Coordinate(-1,0), new Coordinate(2,1),   new Coordinate(-1,-2)]),
-            new (initialOrientation: Orientation.left,  Orientation.two,   [new Coordinate(0,0), new Coordinate(-2,0), new Coordinate(1,0),  new Coordinate(-2,-1), new Coordinate(1,2)]),
-            new (initialOrientation: Orientation.left,  Orientation.zero,  [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(-2,0), new Coordinate(1,-2),  new Coordinate(-2,1)]),
-            new (initialOrientation: Orientation.zero,  Orientation.left,  [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(2,0),  new Coordinate(-1,2),  new Coordinate(2,-1)]),
-        };
-        return data.ToDictionary(x => (initial: x.initialOrientation, next: x.nextOrientation),x => x.wallKickCoordinates);
-    }
-    
 
-    private Dictionary <(Orientation initial, Orientation next), List<Coordinate>> findWallKickLookupForJLSTZShapes()
-    {
-        var data = new List<WallKickData>
-        {
-            new (initialOrientation: Orientation.zero,  Orientation.right, [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(-1,1),  new Coordinate(0,-2), new Coordinate(-1,-2)]),
-            new (initialOrientation: Orientation.right, Orientation.zero,  [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(1,-1),  new Coordinate(0,2),  new Coordinate(1,2)]),
-            new (initialOrientation: Orientation.right, Orientation.two,   [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(1,-1),  new Coordinate(0,2),  new Coordinate(1,2)]),
-            new (initialOrientation: Orientation.two,   Orientation.right, [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(-1,1),  new Coordinate(0,-2), new Coordinate(-1,-2)]),
-            new (initialOrientation: Orientation.two,   Orientation.left,  [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(1,1),   new Coordinate(0,-2), new Coordinate(1,-2)]),
-            new (initialOrientation: Orientation.left,  Orientation.two,   [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(-1,-1), new Coordinate(0,2),  new Coordinate(-1,2)]),
-            new (initialOrientation: Orientation.left,  Orientation.zero,  [new Coordinate(0,0), new Coordinate(-1,0), new Coordinate(-1,-1), new Coordinate(0,2),  new Coordinate(-1,2)]),
-            new (initialOrientation: Orientation.zero,  Orientation.left,  [new Coordinate(0,0), new Coordinate(1,0),  new Coordinate(1,1),   new Coordinate(0,-2), new Coordinate(1,-2)]),
-        };
-        return data.ToDictionary(x => (initial: x.initialOrientation, next: x.nextOrientation),x => x.wallKickCoordinates);
-    }
+    protected abstract Dictionary<(Orientation initial, Orientation next), List<Coordinate>> FindWallKickLookup();
+    protected abstract void CreateShape();
 
 }
 
