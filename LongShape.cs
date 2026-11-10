@@ -4,7 +4,6 @@ public class LongShape:Shape
 {
     public LongShape(Coordinate center):base(center)
     {
-        CreateShape();
     }
 
     protected override void CreateShape()
@@ -17,7 +16,6 @@ public class LongShape:Shape
         xOffset = -0.5F;
         yOffset = -0.5F;
         pixels.AddRange(pixel1,pixel2, pixel3,pixel4);
-        wallKickLookup = FindWallKickLookup();
     }
     
     protected override Dictionary<(Orientation initial, Orientation next), List<Coordinate>> FindWallKickLookup()
