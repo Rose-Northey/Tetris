@@ -8,7 +8,7 @@ public class GameState
     public float gameSpeed;
     public GameStatus gameStatus;
     public int score;
-    private int rowClearPoints = 10;
+    private readonly int rowClearPoints = 10;
     public void Reset()
     {
         gameTime = 0;
