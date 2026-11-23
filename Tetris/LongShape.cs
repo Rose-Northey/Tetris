@@ -8,11 +8,10 @@ public class LongShape:Shape
 
     protected override void CreateShape()
     {
-        center = center with { y = center.y - 1 };
-        var pixel1 = new Pixel(center with {y=center.y-1});
-        var pixel2 = new Pixel(center with {y=center.y-2});
-        var pixel3 = new Pixel(center);
-        var pixel4 = new Pixel(center with { y = center.y + 1 });
+        var pixel1 = new Pixel(new Coordinate(center.x-2,center.y-1));
+        var pixel2 = new Pixel(new Coordinate(center.x-1,center.y-1));
+        var pixel3 = new Pixel(center with { y = center.y - 1});
+        var pixel4 = new Pixel(new Coordinate(center.x+1,center.y-1));
         xOffset = -0.5F;
         yOffset = -0.5F;
         pixels.AddRange(pixel1,pixel2, pixel3,pixel4);

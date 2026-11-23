@@ -7,8 +7,8 @@ public class ShapesOnGrid
     private int nWidth;
     private int nHeight;
     private readonly Coordinate origin;
-    private const int nXPixelsInGrid= 5;
-    private const int nYPixelsInGrid= 10;
+    private int nXPixelsInGrid= 5;
+    private int nYPixelsInGrid= 10;
     private Shape fallingShape;
     private Queue<Shape> waitingShapes;
     private List<Pixel> settledPixels;
@@ -26,6 +26,20 @@ public class ShapesOnGrid
         origin = new Coordinate(xOrigin, yOrigin);
         ResetGrid();
         onRowClear = () => {};
+    }
+
+    public ShapesOnGrid(int windowWidth, int windowHeight, Shape fallingShape, List<Pixel> settledPixels, int nXPixelsInGrid, int nYPixelsInGrid )
+    {
+        var xOrigin = (windowWidth - Pixel.Width * nXPixelsInGrid) / 2;
+        var yOrigin = (windowHeight - Pixel.Width * nYPixelsInGrid) / 2;
+        this.nXPixelsInGrid = nXPixelsInGrid;
+        this.nYPixelsInGrid = nYPixelsInGrid;
+        origin = new Coordinate(xOrigin, yOrigin);
+        waitingShapes = [];
+        this.fallingShape = fallingShape;
+        this.settledPixels = settledPixels;
+        onRowClear = () => {};
+        //TODO: remove this constructor once I've refactored to make only the necessary properties available
     }
     
     private void DrawGrid()
@@ -73,7 +87,7 @@ public class ShapesOnGrid
         }
 
   
-        const int rightHandEdgeOfGameGrid = nXPixelsInGrid;
+        int rightHandEdgeOfGameGrid = nXPixelsInGrid;
         const int topOfGameGrid = 1;
         var rightCorner = new Coordinate(rightHandEdgeOfGameGrid, topOfGameGrid);
         var(rightHandEdgeOfGameGridCanvas,topOfGameGridCanvas) = gridToWindowCoordinates(rightCorner);
@@ -209,7 +223,7 @@ public class ShapesOnGrid
         }
     }
 
-    private static bool isLocatedInsideGrid(Coordinate location)
+    private bool isLocatedInsideGrid(Coordinate location)
     {
         var isXInBounds = location.x >= 0 && location.x < nXPixelsInGrid;
         var isYInBounds = location.y <= nYPixelsInGrid - 1;
